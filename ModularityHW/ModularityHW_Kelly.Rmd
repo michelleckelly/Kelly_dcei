@@ -5,18 +5,61 @@ date: "February 21, 2018"
 output: pdf_document
 ---
 
-```{r}
-setwd("~/Kelly_dcei/ModularityHW/InputData")
-```
-
-str(A)
-
-
 # Opening
+
+climate change, long term trends, etc
 
 # Challenge
 
+research questions: 
+(1) can we see climate warming for ourselves by analyzing this data?
+(2) in what parts of the country are temperatures getting warmer? are there parts of the country where temperatures became colder?
+(3) can we say, based on this data, what change has occured in precipitation over the period?
+
 # Action
+
+```{r, echo=FALSE, message=FALSE}
+# R enviroment setup chunk
+
+library(ggplot2)
+```
+
+```{r, echo=FALSE}
+# Data import chunk
+
+provided <- TRUE # change this based on if loading from API or file (modularity tip)
+
+if (provided == TRUE){
+  precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds")
+  temp <- readRDS(file = "USAAnnualTemp1950_2008.rds")
+}
+```
+
+```{r}
+# Data cleanup chunk
+
+# step 1: throw away less than x years data
+minimumTimespan <- 40 # use only weather stations with at least x years of data
+
+precipTrimmed <- data.frame()
+for (count in 1:length(unique(precip$name))){
+  stationSubset <- precip[precip$name == precip$name[count],]
+  if (max(stationSubset$year) - min(stationSubset$year) > minimumTimespan){
+    # add station to new dataframe
+  }
+  count <- count + 1
+}
+length(unique(precip$name)) # number of stations
+
+#try vectorized functions instead
+aggregate(year~name, precip, FUN = function(year){max(year) - min(year)}) # FIX: correct for first station, but not iterating over all stations
+
+# step 2: 
+```
+
+```{r}
+# Data visualization chunk
+```
 
 # Resolution
 
