@@ -1,48 +1,64 @@
 ---
 title: "ModularityHW_Kelly"
 author: "Michelle Kelly"
-date: "February 21, 2018"
-output: pdf_document
----
+date: "June 4, 2018"
+output: 
+  pdf_document:
+    theme: yeti
+    df_print: paged
+    toc: yes
+    number_sections: true
+---  
 
-# Opening
+<!--R setup chunk (Modularity lesson #8, noting the exact purpose of each Rmd chunk)-->
+```{r setup, echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
+### Global options ###
+# Enable caching in all chunks
+# Set default size of figures to 5x7
+knitr::opts_chunk$set(fig.height = 5, fig.width = 9, cache=TRUE)
 
-climate change, long term trends, etc
-
-# Challenge
-
-research questions: 
-(1) can we see climate warming for ourselves by analyzing this data?
-(2) in what parts of the country are temperatures getting warmer? are there parts of the country where temperatures became colder?
-(3) can we say, based on this data, what change has occured in precipitation over the period?
-
-# Action
-
-<!--R setup chunk (Modularity lesson #8)-->
-```{r, echo=FALSE, message=FALSE}
-# Dependencies: none
-
-# Required packages:
+### Packages ###
 library(ggplot2)
-
-# New variables created: none, packages loaded
+library(data.table)
+library(reshape2)
 ```
 
-<!--Data import chunk-->
-```{r, echo=FALSE, cache=TRUE}
+***  
+
+# Abstract  
+
+(you will have to write this) climate change, long term trends, etc  
+
+***  
+
+# Introduction  
+
+research questions:  
+(1) can we see climate warming for ourselves by analyzing this data?  
+(2) in what parts of the country are temperatures getting warmer? are there parts of the country where temperatures became colder?  
+(3) can we say, based on this data, what change has occured in precipitation over the period?  
+
+***
+
+# Methods  
+
+***
+
+# Results  
+
+```{r dataImport, echo=FALSE}
 # Dependencies: 
-#     R setup chunk
+#   Text files:
 #     USAAnnualPcpn1950_2008.rds
 #     USAAnnualTemp1950_2008.rds
 
-# Required packages: none
+# Variable definitions: 
+#     precip <- annual precipitation data for USA, loaded from USAAnnualPcpn1950_2008.rds
+#     temp <- annual temperature data for USA, loaded from USAAnnualTemp1950_2008.rds
+#     provided <- TRUE if data loaded from file, 
+#                 FALSE if data pulled from API
 
-# New variables created: 
-#     precip <- loaded annual precipitation data from USA annual precip file
-#     temp <- loaded annual temperature data from USA annual temp file
-#     provided <- logic variable that is true if loading data from file, false if loading data from API
-
-provided <- TRUE # change this based on if loading from API or file (modularity lesson #1)
+provided <- TRUE # (modularity lesson #1)
 
 if (provided == TRUE){
   precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds")
@@ -50,58 +66,87 @@ if (provided == TRUE){
 }
 ```
 
-<!--Data cleanup chunk-->
-```{r, echo=FALSE, cache=TRUE}
+```{r dataCleanup, echo=FALSE}
 # Dependencies:
-#     R setup chunk
-#     Data import chunk
+#     dataImport
 
-# Required packages: none
+# Variable definitions:
+#     minimumTimespan <- numeric, minimum years of data each station must have
 
-# New variables created:
-#     precipTrimmed <- a cleaned data frame that only contains the selected data, based on minimumTimespan
-#     minimumTimespan <- numeric, to exclude stations without at least this many years of data
+minimumTimespan <- 40 # years
 
+# Pseudocode for trimming function (modularity lesson #7)
+# trim <- function(dataset, minimumTimespan){
+#   for (each unique station){
+#     find out how many years of data that station has:
+#       count number of non-NA values in $data 
+#     if (years of data > 40){
+#       trimmedDataframe <- (add unique station to dataframe)
+#     }
+#   }
+# return(trimmedDataframe)
+# }
 
+# modularity lesson 2: write extensible code by creating trimming function
+# Input variables:
+#     dataset <- the data.frame that you want to trim
+#     minTime <- minimum years of data each station must have
+# Inner variables:
+#     trimmedDataframe <- skeleton dataframe, to be filled by trim function
+# Output variables:
+#     trimmedDataframe <- data.frame of stations that have data for >= minTime
+trim <- function(dataset, minTime){
+  trimmedDataframe <- data.frame(
+  state = factor(),
+  name = factor(),
+  lon = numeric(),
+  lat = numeric(),
+  data = numeric(),
+  year = integer()
+  )
+  for(stationNumber in 1:length(unique(dataset$name))){
+    stationData <- subset(dataset, dataset$name == unique(dataset$name)[stationNumber])
+    stationTimespan <- length(na.omit(stationData$data))
+    if (stationTimespan >= minTime){
+      trimmedDataframe <- rbindlist(list(trimmedDataframe, stationData))
+    }
+  }
+  return(trimmedDataframe)
+}
 
-# step 1: throw away less than x years data
-minimumTimespan <- 40 # use only weather stations with at least x years of data
+precip <- trim(precip, minimumTimespan)
+temp <- trim(temp, minimumTimespan) # very slow. find a way to fix
 
-length(unique(precip$name)) # number of stations
+# convert dataframe into matrix form
+matricize <- function(dataframe){
+  dataframe <- matrix(data = dataframe$data,
+                             nrow = length(unique(dataframe$year)),
+                             ncol = length(unique(dataframe$name)),
+                             dimnames = list(unique(dataframe$year),
+                                             unique(dataframe$name)))
+  return(dataframe)
+}
 
-#try vectorized functions instead
-
-aggregate(year~name, precip, FUN = function(x){max(x) - min(x)}) # FIX: correct for first station, but not iterating over all stations
-str(precip)
-
-vapply(precip, FUN)
-
-# function to pick out minimum year for each station
-# function to pick out minimum year for just alabaster shelby county
-
-#table(factor(precip$name))
-
-#precip$name[min(precip$year)]
-
-precip$name[precip$year==min(precip$year)]
-precip$name
-
-precip[data$precip %in% precip$name]
-#[precip$year]
-
-#precip$name
-
-apply(precip, MARGIN = c(year, name), FUN = )
-
-# step 2: 
+precip_matrix <- matricize(precip)
+temp_matrix <- matricize(temp)
 ```
 
-```{r}
-# Data visualization chunk
+```{r dataVis_temp, echo=FALSE}
+
 ```
 
-# Resolution
+```{r dataVis_precip, echo=FALSE}
+# significance testing: does basic trend change with time?
+signiftest_precip <- lm(precip$data ~ precip$year)
+summary(signiftest_precip)
 
----
-# notes... be sure to add references
----
+# plotting data with trendline
+matplot(x = names(precip_matrix[,1]), y = precip_matrix, 
+        type = "l", xlab = "Year", ylab = "Average annual precipitation, inches",
+        col = rgb(0, 0, (1:10)/10), lty = 1)
+abline(signiftest_precip, col = "red")
+```
+
+# Discussion
+
+# References
