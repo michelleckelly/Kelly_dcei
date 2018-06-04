@@ -18,16 +18,31 @@ research questions:
 
 # Action
 
+<!--R setup chunk (Modularity lesson #8)-->
 ```{r, echo=FALSE, message=FALSE}
-# R enviroment setup chunk
+# Dependencies: none
 
+# Required packages:
 library(ggplot2)
+
+# New variables created: none, packages loaded
 ```
 
-```{r, echo=FALSE}
-# Data import chunk
+<!--Data import chunk-->
+```{r, echo=FALSE, cache=TRUE}
+# Dependencies: 
+#     R setup chunk
+#     USAAnnualPcpn1950_2008.rds
+#     USAAnnualTemp1950_2008.rds
 
-provided <- TRUE # change this based on if loading from API or file (modularity tip)
+# Required packages: none
+
+# New variables created: 
+#     precip <- loaded annual precipitation data from USA annual precip file
+#     temp <- loaded annual temperature data from USA annual temp file
+#     provided <- logic variable that is true if loading data from file, false if loading data from API
+
+provided <- TRUE # change this based on if loading from API or file (modularity lesson #1)
 
 if (provided == TRUE){
   precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds")
@@ -35,24 +50,48 @@ if (provided == TRUE){
 }
 ```
 
-```{r}
-# Data cleanup chunk
+<!--Data cleanup chunk-->
+```{r, echo=FALSE, cache=TRUE}
+# Dependencies:
+#     R setup chunk
+#     Data import chunk
+
+# Required packages: none
+
+# New variables created:
+#     precipTrimmed <- a cleaned data frame that only contains the selected data, based on minimumTimespan
+#     minimumTimespan <- numeric, to exclude stations without at least this many years of data
+
+
 
 # step 1: throw away less than x years data
 minimumTimespan <- 40 # use only weather stations with at least x years of data
 
-precipTrimmed <- data.frame()
-for (count in 1:length(unique(precip$name))){
-  stationSubset <- precip[precip$name == precip$name[count],]
-  if (max(stationSubset$year) - min(stationSubset$year) > minimumTimespan){
-    # add station to new dataframe
-  }
-  count <- count + 1
-}
 length(unique(precip$name)) # number of stations
 
 #try vectorized functions instead
-aggregate(year~name, precip, FUN = function(year){max(year) - min(year)}) # FIX: correct for first station, but not iterating over all stations
+
+aggregate(year~name, precip, FUN = function(x){max(x) - min(x)}) # FIX: correct for first station, but not iterating over all stations
+str(precip)
+
+vapply(precip, FUN)
+
+# function to pick out minimum year for each station
+# function to pick out minimum year for just alabaster shelby county
+
+#table(factor(precip$name))
+
+#precip$name[min(precip$year)]
+
+precip$name[precip$year==min(precip$year)]
+precip$name
+
+precip[data$precip %in% precip$name]
+#[precip$year]
+
+#precip$name
+
+apply(precip, MARGIN = c(year, name), FUN = )
 
 # step 2: 
 ```
