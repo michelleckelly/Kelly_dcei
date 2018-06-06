@@ -9,8 +9,8 @@ output:
     toc: yes
     number_sections: true
 ---  
-
-<!--R setup chunk (Modularity lesson #8, noting the exact purpose of each Rmd chunk)-->
+<!-- MODULARITY LESSON 8: note exact purpose of each Rmd chunk-->
+<!-- R setup chunk -->
 ```{r setup, echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
 ### Global options ###
 # Enable caching in all chunks
@@ -70,54 +70,15 @@ if (provided == TRUE){
 # Dependencies:
 #     dataImport
 
-# Variable definitions:
-#     minimumTimespan <- numeric, minimum years of data each station must have
+# Function: matricize
+# Purpose: convert data frame into matrix from, pre-processing before cleaning data
+# Input:
+# dataframe     
+#   dataframe of either temperature or precipitation data from given files
+# Return:
+# dataframe
+#   matrix of years (rows) and sites (colums) filled with either temp or precip data
 
-minimumTimespan <- 40 # years
-
-# Pseudocode for trimming function (modularity lesson #7)
-# trim <- function(dataset, minimumTimespan){
-#   for (each unique station){
-#     find out how many years of data that station has:
-#       count number of non-NA values in $data 
-#     if (years of data > 40){
-#       trimmedDataframe <- (add unique station to dataframe)
-#     }
-#   }
-# return(trimmedDataframe)
-# }
-
-# modularity lesson 2: write extensible code by creating trimming function
-# Input variables:
-#     dataset <- the data.frame that you want to trim
-#     minTime <- minimum years of data each station must have
-# Inner variables:
-#     trimmedDataframe <- skeleton dataframe, to be filled by trim function
-# Output variables:
-#     trimmedDataframe <- data.frame of stations that have data for >= minTime
-trim <- function(dataset, minTime){
-  trimmedDataframe <- data.frame(
-  state = factor(),
-  name = factor(),
-  lon = numeric(),
-  lat = numeric(),
-  data = numeric(),
-  year = integer()
-  )
-  for(stationNumber in 1:length(unique(dataset$name))){
-    stationData <- subset(dataset, dataset$name == unique(dataset$name)[stationNumber])
-    stationTimespan <- length(na.omit(stationData$data))
-    if (stationTimespan >= minTime){
-      trimmedDataframe <- rbindlist(list(trimmedDataframe, stationData))
-    }
-  }
-  return(trimmedDataframe)
-}
-
-precip <- trim(precip, minimumTimespan)
-temp <- trim(temp, minimumTimespan) # very slow. find a way to fix
-
-# convert dataframe into matrix form
 matricize <- function(dataframe){
   dataframe <- matrix(data = dataframe$data,
                              nrow = length(unique(dataframe$year)),
@@ -129,13 +90,54 @@ matricize <- function(dataframe){
 
 precip_matrix <- matricize(precip)
 temp_matrix <- matricize(temp)
+
+# Function: trim
+# Purpose: subset data, keeping only sites with more than minumum number of years of data
+# Input variables:
+#     minimumTimespan <- numeric, minimum years of data each station must have
+#     dataset <- the data.frame that you want to trim
+#     minTime <- minimum years of data each station must have
+# Inner variables:
+#     trimmedDataframe <- skeleton dataframe, to be filled by trim function
+# Output variables:
+#     trimmedDataframe <- data.frame of stations that have data for >= minTime
+
+### MODULARITY LESSON 1: variables, not constants ###
+minimumTimespan <- 40 # years
+
+### MODULARITY LESSON 7: Pseudocode for trimming function ###
+# trim <- function(dataset, minimumTimespan){
+#   for (each unique station){
+#     find out how many years of data that station has:
+#       count number of non-NA values in $data 
+#     if (years of data > 40){
+#       trimmedDataframe <- (add unique station to dataframe)
+#     }
+#   }
+# return(trimmedDataframe)
+# }
+
+### MODULARITY LESSON 2: write extensible code by creating trimming function ###
+trim <- function(dataset, minTime){
+  for(stationNumber in 1:ncol(dataset)){
+    stationTimespan <- length(na.omit(precip_matrix[,stationNumber]))
+    if (stationTimespan <= minTime){
+      dataset <- dataset[,-stationNumber]
+    }
+  }
+  return(dataset)
+}
+
+precip_matrix <- trim(precip_matrix, minimumTimespan)
+temp_matrix <- trim(temp_matrix, minimumTimespan)
+
 ```
 
 ```{r dataVis_temp, echo=FALSE}
 
 ```
 
-```{r dataVis_precip, echo=FALSE}
+```{r dataVis_precip, echo=FALSE, eval = FALSE}
 # significance testing: does basic trend change with time?
 signiftest_precip <- lm(precip$data ~ precip$year)
 summary(signiftest_precip)
