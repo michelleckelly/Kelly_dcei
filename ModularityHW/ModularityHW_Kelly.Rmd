@@ -21,6 +21,8 @@ knitr::opts_chunk$set(fig.height = 5, fig.width = 9, cache=TRUE)
 library(ggplot2)
 library(data.table)
 library(reshape2)
+library(maps)
+library(maptools)
 ```
 
 ***  
@@ -118,35 +120,65 @@ minimumTimespan <- 40 # years
 # }
 
 ### MODULARITY LESSON 2: write extensible code by creating trimming function ###
-trim <- function(dataset, minTime){
-  for(stationNumber in 1:ncol(dataset)){
-    stationTimespan <- length(na.omit(precip_matrix[,stationNumber]))
-    if (stationTimespan <= minTime){
-      dataset <- dataset[,-stationNumber]
-    }
+#trim <- function(dataset, minTime){
+  #for(i in 1:ncol(dataset)){
+    #if (length(na.omit(dataset[,i])) <= minTime){
+      #dataset <- dataset[,-i]
+      #i <- i + 1
+#    }
+#  }
+#  return(dataset)
+#}
+
+yearsofdata_precip <- colSums(!is.na(precip_matrix))
+for (i in 1:ncol(precip_matrix)){
+  if (yearsofdata_precip[i] <= 40){
+  precip_matrix <- precip_matrix[,-i]
   }
-  return(dataset)
 }
 
-precip_matrix <- trim(precip_matrix, minimumTimespan)
-temp_matrix <- trim(temp_matrix, minimumTimespan)
-
+yearsofdata_temp <- colSums(!is.na(temp_matrix))
+for (i in 1:ncol(temp_matrix)){
+  if (yearsofdata_temp[i] <= 40){
+  temp_matrix <- temp_matrix[,-i]
+  }
+}
+ncol(temp_matrix)
+yearsofdata_temp
 ```
 
 ```{r dataVis_temp, echo=FALSE}
+# significance testing: does basic trend change with time?
+str(na.omit(temp))
+signiftest_temp <- lm(na.omit(temp)$data ~ na.omit(temp)$year)
+summary(signiftest_temp)
 
+# average trend
+temp_means <- rowMeans(temp_matrix, na.rm = TRUE)
+str(temp_means)
+
+# plotting data with trendline
+matplot(x = names(temp_matrix[,1]), y = temp_matrix,
+        type = "l", xlab = "Year", ylab = "Average annual temperature (degrees F)",
+        ylim = c(0,100), col = rgb(0, (1:10)/10, 0))
+par(new = TRUE)
+plot(x = names(temp_means), y = temp_means, ylim = c(0,100), ann = FALSE,
+     type = "l", axes = FALSE, col = "white", lwd = 4)
+par(new = FALSE)
+
+usa <- map_data("usa")
 ```
 
-```{r dataVis_precip, echo=FALSE, eval = FALSE}
+```{r dataVis_precip, echo=FALSE}
 # significance testing: does basic trend change with time?
 signiftest_precip <- lm(precip$data ~ precip$year)
 summary(signiftest_precip)
 
 # plotting data with trendline
 matplot(x = names(precip_matrix[,1]), y = precip_matrix, 
-        type = "l", xlab = "Year", ylab = "Average annual precipitation, inches",
-        col = rgb(0, 0, (1:10)/10), lty = 1)
-abline(signiftest_precip, col = "red")
+        type = "l", xlab = "Year", ylab = "Average annual precipitation (inches)",
+        col = rgb(0, 0, (1:10)/10))
+abline(signiftest_precip, col = "red", lwd = 2)
 ```
 
 # Discussion
