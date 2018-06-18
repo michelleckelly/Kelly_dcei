@@ -162,16 +162,27 @@ precip <- data.frame(StationName = precip$name,
 precip <- subset(precip, !is.na(precip$Precip))
 # determine which stations have x or more years of data
 
-#aggregate(precip,
-#          list(State = precip$state,
-#               StationName = precip$name,
-#               Lat = precip$lat,
-#               Lon = precip$lat,
-#               Year = precip$year,
-#               Data = nrow(precip$data) > 40),
-#          by = name, FUN = mean)
 
 
+cleanByYear <- function(dataframe, nYears){
+  # get rid of all NA data, so the number of entries will equal the number of years of data 
+  dataframe <- na.exclude(dataframe)
+  # add a count column, to count the number of years of data for each site
+  dataframe$count <- table(dataframe$name)[dataframe$name]
+  # if count is less than number of desired years, NA data
+  for (row in 1:nrow(dataframe)){
+    if (dataframe$count[row] <= nYears){
+      dataframe[row,] <- NA
+    }
+  }
+  # remove NA data from dataframe
+  dataframe <- na.exclude(dataframe)
+  # return dataframe without count column
+  dataframe$count <- NULL
+  return(dataframe)
+}
+
+precip2 <- cleanByYear(precip, 40)
 ```
 
 ```{r dataVis_temp, echo=FALSE}
@@ -194,6 +205,9 @@ plot(x = names(temp_means), y = temp_means, ylim = c(0,100), ann = FALSE,
 par(new = FALSE)
 
 #usa <- map_data("usa")
+
+
+
 
 ```
 
