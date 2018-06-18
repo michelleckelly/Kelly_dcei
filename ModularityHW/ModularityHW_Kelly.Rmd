@@ -145,6 +145,33 @@ for (i in 1:ncol(temp_matrix)){
 }
 ncol(temp_matrix)
 yearsofdata_temp
+
+# to improve effciency: trying vectorized functions
+str(precip)
+# idea: seperate data into location data and preciptiation dataframes
+# location data
+precip_metadata <- unique(data.frame(State = precip$state,
+                                     StationName = precip$name,
+                                     Lat = precip$lat,
+                                     Lon = precip$lon))
+# precipitation data
+precip <- data.frame(StationName = precip$name,
+                     Year = precip$year,
+                     Precip = precip$data)
+# subset to only non-NA precipitation data
+precip <- subset(precip, !is.na(precip$Precip))
+# determine which stations have x or more years of data
+
+#aggregate(precip,
+#          list(State = precip$state,
+#               StationName = precip$name,
+#               Lat = precip$lat,
+#               Lon = precip$lat,
+#               Year = precip$year,
+#               Data = nrow(precip$data) > 40),
+#          by = name, FUN = mean)
+
+
 ```
 
 ```{r dataVis_temp, echo=FALSE}
@@ -166,7 +193,8 @@ plot(x = names(temp_means), y = temp_means, ylim = c(0,100), ann = FALSE,
      type = "l", axes = FALSE, col = "white", lwd = 4)
 par(new = FALSE)
 
-usa <- map_data("usa")
+#usa <- map_data("usa")
+
 ```
 
 ```{r dataVis_precip, echo=FALSE}
