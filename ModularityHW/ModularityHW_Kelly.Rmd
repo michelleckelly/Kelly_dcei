@@ -13,9 +13,9 @@ output:
 <!-- R setup chunk -->
 ```{r setup, echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
 ### Global options ###
+knitr::opts_chunk$set(fig.height = 5, fig.width = 9, cache=TRUE)
 # Enable caching in all chunks
 # Set default size of figures to 5x7
-knitr::opts_chunk$set(fig.height = 5, fig.width = 9, cache=TRUE)
 
 ### Packages ###
 library(ggplot2)
@@ -23,6 +23,7 @@ library(data.table)
 library(reshape2)
 library(maps)
 library(maptools)
+library(dplyr)
 ```
 
 ***  
@@ -50,119 +51,36 @@ research questions:
 
 ```{r dataImport, echo=FALSE}
 # Dependencies: 
-#   Text files:
 #     USAAnnualPcpn1950_2008.rds
 #     USAAnnualTemp1950_2008.rds
 
-# Variable definitions: 
-#     precip <- annual precipitation data for USA, loaded from USAAnnualPcpn1950_2008.rds
-#     temp <- annual temperature data for USA, loaded from USAAnnualTemp1950_2008.rds
-#     provided <- TRUE if data loaded from file, 
-#                 FALSE if data pulled from API
-
-provided <- TRUE # (modularity lesson #1)
+provided <- TRUE
+# provided <- TRUE if data loaded from file, FALSE if data pulled from API
 
 if (provided == TRUE){
   precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds")
+  # precip <- annual precipitation data for USA
   temp <- readRDS(file = "USAAnnualTemp1950_2008.rds")
+  # temp <- annual temperature data for USA
 }
 ```
 
 ```{r dataCleanup, echo=FALSE}
-# Dependencies:
-#     dataImport
-
-# Function: matricize
-# Purpose: convert data frame into matrix from, pre-processing before cleaning data
-# Input:
-# dataframe     
-#   dataframe of either temperature or precipitation data from given files
-# Return:
-# dataframe
-#   matrix of years (rows) and sites (colums) filled with either temp or precip data
-
-matricize <- function(dataframe){
-  dataframe <- matrix(data = dataframe$data,
-                             nrow = length(unique(dataframe$year)),
-                             ncol = length(unique(dataframe$name)),
-                             dimnames = list(unique(dataframe$year),
-                                             unique(dataframe$name)))
-  return(dataframe)
-}
-
-precip_matrix <- matricize(precip)
-temp_matrix <- matricize(temp)
-
-# Function: trim
-# Purpose: subset data, keeping only sites with more than minumum number of years of data
-# Input variables:
-#     minimumTimespan <- numeric, minimum years of data each station must have
-#     dataset <- the data.frame that you want to trim
-#     minTime <- minimum years of data each station must have
-# Inner variables:
-#     trimmedDataframe <- skeleton dataframe, to be filled by trim function
-# Output variables:
-#     trimmedDataframe <- data.frame of stations that have data for >= minTime
-
 ### MODULARITY LESSON 1: variables, not constants ###
-minimumTimespan <- 40 # years
+minYears <- 40
+# minYears <- minimum years of data each station must have to be included in analysis
 
 ### MODULARITY LESSON 7: Pseudocode for trimming function ###
 # trim <- function(dataset, minimumTimespan){
-#   for (each unique station){
-#     find out how many years of data that station has:
-#       count number of non-NA values in $data 
-#     if (years of data > 40){
-#       trimmedDataframe <- (add unique station to dataframe)
-#     }
+#   exclude years that have no data
+#   count number of years of data for each station
+#   if (years of data <= 40){
+#     exclude station from dataframe
 #   }
-# return(trimmedDataframe)
+#   return(dataframe)
 # }
 
 ### MODULARITY LESSON 2: write extensible code by creating trimming function ###
-#trim <- function(dataset, minTime){
-  #for(i in 1:ncol(dataset)){
-    #if (length(na.omit(dataset[,i])) <= minTime){
-      #dataset <- dataset[,-i]
-      #i <- i + 1
-#    }
-#  }
-#  return(dataset)
-#}
-
-yearsofdata_precip <- colSums(!is.na(precip_matrix))
-for (i in 1:ncol(precip_matrix)){
-  if (yearsofdata_precip[i] <= 40){
-  precip_matrix <- precip_matrix[,-i]
-  }
-}
-
-yearsofdata_temp <- colSums(!is.na(temp_matrix))
-for (i in 1:ncol(temp_matrix)){
-  if (yearsofdata_temp[i] <= 40){
-  temp_matrix <- temp_matrix[,-i]
-  }
-}
-ncol(temp_matrix)
-yearsofdata_temp
-
-# to improve effciency: trying vectorized functions
-str(precip)
-# idea: seperate data into location data and preciptiation dataframes
-# location data
-precip_metadata <- unique(data.frame(State = precip$state,
-                                     StationName = precip$name,
-                                     Lat = precip$lat,
-                                     Lon = precip$lon))
-# precipitation data
-precip <- data.frame(StationName = precip$name,
-                     Year = precip$year,
-                     Precip = precip$data)
-# subset to only non-NA precipitation data
-precip <- subset(precip, !is.na(precip$Precip))
-# determine which stations have x or more years of data
-
-
 
 cleanByYear <- function(dataframe, nYears){
   # get rid of all NA data, so the number of entries will equal the number of years of data 
@@ -182,10 +100,40 @@ cleanByYear <- function(dataframe, nYears){
   return(dataframe)
 }
 
-precip2 <- cleanByYear(precip, 40)
+precip <- cleanByYear(precip, minYears)
+temp <- cleanByYear(temp, minYears)
+```
+
+```{r dataAnalysis, echo = FALSE}
+precip_summary <- data.frame(year = precip$year, 
+                             data = precip$data)
+precip %>% group_by(year) %>% summarize(mean_precip = mean(data), sd_precip = sd(data))
+
+yearlyStatistics <- function(dataframe){
+  dataframe %>% group_by(year) %>% summarize(mean = mean(data), sd = sd(data))
+}
+
+precip_summary <- yearlyStatistics(precip)
+temp_summary <- yearlyStatistics(temp)
 ```
 
 ```{r dataVis_temp, echo=FALSE}
+ggplot(data = precip_summary, aes(x = year, y = mean)) +
+  geom_line() + geom_point() +
+  geom_smooth(method = "lm") +
+  #geom_errorbar(aes(ymax = mean+sd, ymin = mean-sd)) +
+  xlab("Year") + ylab("Mean precipitation (in)") +
+  theme_classic()
+
+ggplot(data = temp_summary, aes(x = year, y = mean)) +
+  geom_line() + geom_point() +
+  geom_smooth(method = "lm") +
+  #geom_errorbar(aes(ymax = mean+sd, ymin = mean-sd)) +
+  xlab("Year") + ylab("Mean temperature (F)") +
+  theme_classic()
+
+
+
 # significance testing: does basic trend change with time?
 str(na.omit(temp))
 signiftest_temp <- lm(na.omit(temp)$data ~ na.omit(temp)$year)
