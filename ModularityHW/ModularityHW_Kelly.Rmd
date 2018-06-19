@@ -9,21 +9,20 @@ output:
     toc: yes
     number_sections: true
 ---  
-<!-- MODULARITY LESSON 8: note exact purpose of each Rmd chunk-->
-<!-- R setup chunk -->
+<!-- MODULARITY LESSON 8: have defined purpose for each Rmd chunk-->
 ```{r setup, echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
-### Global options ###
-knitr::opts_chunk$set(fig.height = 5, fig.width = 9, cache=TRUE)
-# Enable caching in all chunks
-# Set default size of figures to 5x7
+# Global options
+knitr::opts_chunk$set(fig.height = 5, fig.width = 15, cache=TRUE) 
+# Enable caching in all chunks, Set default size of figures to 5x9
 
-### Packages ###
-library(ggplot2)
+# Packages
+library(dplyr)
 library(data.table)
-library(reshape2)
+library(ggplot2)
 library(maps)
 library(maptools)
-library(dplyr)
+library(mapdata)
+library(viridis)
 ```
 
 ***  
@@ -54,23 +53,20 @@ research questions:
 #     USAAnnualPcpn1950_2008.rds
 #     USAAnnualTemp1950_2008.rds
 
-provided <- TRUE
-# provided <- TRUE if data loaded from file, FALSE if data pulled from API
+provided <- TRUE # TRUE if data loaded from file, FALSE if data pulled from API
 
 if (provided == TRUE){
-  precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds")
-  # precip <- annual precipitation data for USA
-  temp <- readRDS(file = "USAAnnualTemp1950_2008.rds")
-  # temp <- annual temperature data for USA
+  precip <- readRDS(file = "USAAnnualPcpn1950_2008.rds") # annual precipitation data for USA
+  temp <- readRDS(file = "USAAnnualTemp1950_2008.rds") # annual temperature data for USA
 }
 ```
 
 ```{r dataCleanup, echo=FALSE}
-### MODULARITY LESSON 1: variables, not constants ###
-minYears <- 40
-# minYears <- minimum years of data each station must have to be included in analysis
+# MODULARITY LESSON 1: variables, not constants
+minYears <- 40 # minimum years of data for each station
 
-### MODULARITY LESSON 7: Pseudocode for trimming function ###
+# MODULARITY LESSON 7: Pseudocode for trimming function
+
 # trim <- function(dataset, minimumTimespan){
 #   exclude years that have no data
 #   count number of years of data for each station
@@ -80,22 +76,17 @@ minYears <- 40
 #   return(dataframe)
 # }
 
-### MODULARITY LESSON 2: write extensible code by creating trimming function ###
+# MODULARITY LESSON 2: write extensible code by creating trimming function
 
 cleanByYear <- function(dataframe, nYears){
-  # get rid of all NA data, so the number of entries will equal the number of years of data 
   dataframe <- na.exclude(dataframe)
-  # add a count column, to count the number of years of data for each site
   dataframe$count <- table(dataframe$name)[dataframe$name]
-  # if count is less than number of desired years, NA data
   for (row in 1:nrow(dataframe)){
     if (dataframe$count[row] <= nYears){
       dataframe[row,] <- NA
     }
   }
-  # remove NA data from dataframe
   dataframe <- na.exclude(dataframe)
-  # return dataframe without count column
   dataframe$count <- NULL
   return(dataframe)
 }
@@ -105,71 +96,99 @@ temp <- cleanByYear(temp, minYears)
 ```
 
 ```{r dataAnalysis, echo = FALSE}
-precip_summary <- data.frame(year = precip$year, 
-                             data = precip$data)
-precip %>% group_by(year) %>% summarize(mean_precip = mean(data), sd_precip = sd(data))
-
+# yearlyStatistics: mean data across USA for each year
 yearlyStatistics <- function(dataframe){
-  dataframe %>% group_by(year) %>% summarize(mean = mean(data), sd = sd(data))
+  dataframe %>% group_by(year) %>% summarize(mean = mean(data))
 }
 
 precip_summary <- yearlyStatistics(precip)
 temp_summary <- yearlyStatistics(temp)
+
+# stateStatistics: mean data across each state for each year
+
+# stateStatistics pseudocode:
+#   1. compute overall average, so we can compare values to the average
+#   2. group the data by year and state
+#   3. compute the mean, standard deviation, and difference of values from the yearly average
+#       where negative difference values represent colder/less rain than average
+#       positive values represent warmer/more rain than average
+
+stateStatistics <- function(dataframe){
+  dataframe_state <- 
+    dataframe %>% 
+      group_by(year, state) %>% 
+      summarize(mean = mean(data))
+  
+  dataframe_statesummary <- 
+    dataframe_state %>%
+      group_by(state) %>%
+      summarise(state_mean = mean(mean))
+  
+  dataframe_merge <- 
+    merge(dataframe_state, dataframe_statesummary, by = "state")
+}
+
+precip_state <- stateStatistics(precip)
+temp_state <- stateStatistics(temp)
+
+# deviation: compute difference between state yearly average and state overall (1950-2008) average
+deviation <- function(dataset){
+  dataset$mean - dataset$state_mean
+}
+
+precip_state$change <- deviation(precip_state)
+temp_state$change <- deviation(temp_state)
 ```
 
-```{r dataVis_temp, echo=FALSE}
-ggplot(data = precip_summary, aes(x = year, y = mean)) +
+```{r dataVisualization, echo=FALSE}
+# yearlyPlot: simple plot of yearly means, with added trendline
+yearlyPlot <- function(dataset, ylabel, ...){
+  ggplot(data = dataset, aes(x = year, y = mean, ...)) +
   geom_line() + geom_point() +
   geom_smooth(method = "lm") +
-  #geom_errorbar(aes(ymax = mean+sd, ymin = mean-sd)) +
-  xlab("Year") + ylab("Mean precipitation (in)") +
+  xlab("Year") + ylab(ylabel) +
   theme_classic()
+}
 
-ggplot(data = temp_summary, aes(x = year, y = mean)) +
-  geom_line() + geom_point() +
-  geom_smooth(method = "lm") +
-  #geom_errorbar(aes(ymax = mean+sd, ymin = mean-sd)) +
-  xlab("Year") + ylab("Mean temperature (F)") +
+yearlyPlot(precip_summary, ylabel = "USA mean precipitation (in)")
+yearlyPlot(temp_summary, ylabel = "USA mean temperature (F)")
+
+# heatmap: a non-map breakdown of state time series data
+heatmap <- function(dataset, plottitle, legendlabel, ...){
+  ggplot(dataset, aes(x = state, y = year, ...)) +
+  geom_tile(aes(fill = change), color = "white") +
+  scale_fill_distiller(type = "div", palette = 4, name = legendlabel) +
+  xlab("State") + ylab("Year") + ggtitle(plottitle) +
   theme_classic()
+}
 
+heatmap(temp_state, legendlabel = "Temperature change °F",
+        plottitle = "Difference in annual mean temperature, relative to 1950-2008 state mean")
 
+heatmap(precip_state, legendlabel = "Precipitation change (in)",
+        plottitle = "Difference in annual precipitation, relative to 1950-2008 state mean")
 
-# significance testing: does basic trend change with time?
-str(na.omit(temp))
-signiftest_temp <- lm(na.omit(temp)$data ~ na.omit(temp)$year)
-summary(signiftest_temp)
-
-# average trend
-temp_means <- rowMeans(temp_matrix, na.rm = TRUE)
-str(temp_means)
-
-# plotting data with trendline
-matplot(x = names(temp_matrix[,1]), y = temp_matrix,
-        type = "l", xlab = "Year", ylab = "Average annual temperature (degrees F)",
-        ylim = c(0,100), col = rgb(0, (1:10)/10, 0))
-par(new = TRUE)
-plot(x = names(temp_means), y = temp_means, ylim = c(0,100), ann = FALSE,
-     type = "l", axes = FALSE, col = "white", lwd = 4)
-par(new = FALSE)
-
-#usa <- map_data("usa")
-
-
-
+# mapping
 
 ```
 
-```{r dataVis_precip, echo=FALSE}
-# significance testing: does basic trend change with time?
-signiftest_precip <- lm(precip$data ~ precip$year)
-summary(signiftest_precip)
+```{r significance_testing, echo = FALSE}
+# significance testing: yearly means
+sigtest_precip <- lm(precip_summary$mean ~ precip_summary$year)
+summary(sigtest_precip) # not signif
 
-# plotting data with trendline
-matplot(x = names(precip_matrix[,1]), y = precip_matrix, 
-        type = "l", xlab = "Year", ylab = "Average annual precipitation (inches)",
-        col = rgb(0, 0, (1:10)/10))
-abline(signiftest_precip, col = "red", lwd = 2)
+sigtest_temp <- lm(temp_summary$mean ~ temp_summary$year)
+summary(sigtest_temp) # not signif
+
+# significance testing: change by state
+summary(lm(temp_state$change ~ temp_state$year)) # signif
+
+summary(lm(precip_state$change ~ precip_state$year)) #signif
 ```
+
+
+
+
 
 # Discussion
 
