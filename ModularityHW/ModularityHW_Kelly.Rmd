@@ -142,19 +142,31 @@ deviation <- function(dataset_state){
 precip_state$change <- deviation(precip_state)
 temp_state$change <- deviation(temp_state)
 
-# for mapping: compute mean deviation from state overall average across 1950-2008
+# timeseries.change: compute mean deviation from state overall average across 1950-2008
 timeseries.change <- function(dataset_state){
   dataset_state %>%
     group_by(state) %>%
-    summarize(mean.change = mean(change))
+    summarize(sum.change = sum(change))
 }
 
 precip.timeseries.change <- timeseries.change(precip_state)
 temp.timeseries.change <- timeseries.change(temp_state)
+
+# data for mapping: plot mean deviation from average over last century of data (1998-2008) compared to mean deviation from average during 1950-1960
+temp.change <- function(dataset, minYear, maxYear){
+  dataset %>%
+    group_by(state, year) %>%
+    filter(year >= minYear & year <= maxYear) %>%
+    group_by(state) %>%
+    summarize(mean.change = mean(change)) 
+}
+
+temp.change.1950.1960 <- temp.change(temp_state, minYear = 1950, maxYear = 1960)
+temp.change.1998.2008 <- temp.change(temp_state, minYear = 1998, maxYear = 2008)
 ```
 
 
-```{r dataVisualization_yearlyPlot, echo=FALSE}
+```{r dataVis_overallPlot, echo=FALSE, include=FALSE}
 # yearlyPlot: simple plot of yearly means, with added trendline
 yearlyPlot <- function(dataset, ylabel, ...){
   ggplot(data = dataset, aes(x = year, y = mean, ...)) +
@@ -166,29 +178,6 @@ yearlyPlot <- function(dataset, ylabel, ...){
 
 yearlyPlot(precip_summary, ylabel = "Yearly averaged precipitation (in)")
 yearlyPlot(temp_summary, ylabel = "Yearly averaged temperature (F)")
-
-
-
-
-
-
-# mapping
-states <- map_data("state") # pull up usa map data
-
-# match state data with temp data
-states$region <- toupper(states$region)
-setnames(states, "region", "state")
-
-temp_state$state <- toupper(state.name[match(temp_state$state,state.abb)])
-
-temp_mapping <- inner_join(states, temp_state, by = "state")
-#subset()
-
-ggplot() + 
-  geom_polygon(data = temp_mapping, aes(x=long, y = lat, fill = change, group = group),
-               color = "white") +
-  coord_fixed(1.3) +
-  theme_minimal()
 
 ```
 
@@ -204,10 +193,10 @@ heatmap <- function(dataset, legendlabel, ...){
 }
 
 # change.barplot: visualization of change through time using bars
-change.barplot <- function(dataset_state, ylabel, ...){
+change.barplot <- function(dataset_state, ylabel, col_number, ...){
   ggplot(dataset_state, aes(x = year, y = change, ...)) +
     geom_col(aes(fill = change)) +
-    facet_grid(~ state) +
+    facet_wrap(~ state, ncol = col_number) +
     scale_fill_distiller(type = "div", palette = 7) +
     xlab("Year") + ylab(ylabel) +
     theme_classic() +
@@ -216,10 +205,10 @@ change.barplot <- function(dataset_state, ylabel, ...){
 }
 ```
 
-```{r heatmap_temp, echo=FALSE, fig.cap="\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
+```{r heatmap_temp, echo=FALSE, fig.width = 12, fig.height = 5, fig.cap="\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
 
 # Anomalies in annual mean temperature, relative to 1950-2008 state average
-heatmap(temp_state, legendlabel = "Temperature change °F")
+heatmap(temp_state, legendlabel = "Temperature change (°F)")
 ```
 
 ```{r heatmap_precip, echo=FALSE, fig.width = 15, fig.height = 5, fig.cap="\\label{fig:figs}Anomalies in annual precipitation, relative to 1950-2008 state average"}
@@ -228,17 +217,74 @@ heatmap(temp_state, legendlabel = "Temperature change °F")
 grid.arrange(
   heatmap(precip_state, legendlabel = "Precipitation 
 change (in)"),
-  change.barplot(precip_state, ylabel = "Precipitation change (in)"),
+  change.barplot(precip_state, ylabel = "Precipitation change (in)", col_number = 3),
   layout_matrix = rbind(c(1,2,2,2),
                         c(1,2,2,2))
 )
 ```
 
-```{r barplot_temp, echo = FALSE, fig.cap = "\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
+```{r mapping, echo = FALSE}
+states <- map_data("state")
 
-change.barplot(precip_state, ylabel = "Precipitation change (in)",
-               plottitle = "Anomalies in annual precipitation, relative to 1950-2008 state average")
+# state data is formatted differently in each dataframe, we need this to match so we can join dataframes
+states$region <- toupper(states$region)
+setnames(states, "region", "state")
+
+# state.convert: using built-in r datasets to convert from state abbreviations to state names
+state.convert <- function(dataframe_column){
+  toupper(state.name[match(dataframe_column, state.abb)])
+}
+
+temp.change.1950.1960$state <- state.convert(temp.change.1950.1960$state)
+temp.change.1998.2008$state <- state.convert(temp.change.1998.2008$state)
+
+# join dataframes
+temp.change.1950.1960 <- inner_join(states, temp.change.1950.1960, by = "state")
+temp.change.1998.2008 <- inner_join(states, temp.change.1998.2008, by = "state")
+
+# plot the two datasets
+ggplot(data = temp.change.1950.1960) +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
+               color = "white") +
+  scale_fill_distiller(type = "div", palette = 7,
+                       name = "Temperature change (°F)   ") +
+  coord_fixed(1.3) +
+  theme_minimal()
+
+ggplot(data = temp.change.1998.2008) +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
+               color = "white") +
+  coord_fixed(1.3) +
+  scale_fill_distiller(limits = c(-2,2),
+                       type = "div", palette = 7, 
+                       name = "Temperature change (°F)   ") +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank())
+
+mapping <- function(map_dataset, limit_vec){
+  ggplot(data = map_dataset) +
+    geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
+                 color = "white") +
+    coord_fixed(1.3) +
+    scale_fill_distiller(limits = limit_vec, 
+                        type = "seq", palette = 7, direction = 1,
+                         name = "Temperature change (°F)   ") +
+    theme_classic() +
+    theme(legend.position = "bottom",
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank())
+}
+
+mapping(temp.change.1998.2008, limit_vec = c(0,1.5))
+
 ```
+
 
 ```{r significance_testing, echo = FALSE}
 # significance testing: yearly means
@@ -254,10 +300,19 @@ summary(lm(temp_state$change ~ temp_state$year)) # signif
 summary(lm(precip_state$change ~ precip_state$year)) #signif
 ```
 
-
-
-
-
 # Discussion
 
 # References
+
+# Supplemental
+
+```{r barplot_temp, echo = FALSE, fig.width = 17, fig.height = 17, fig.cap = "\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
+change.barplot(temp_state, ylabel = "Temperature change (°F)", col_number = 5)
+```
+
+
+
+
+
+
+
