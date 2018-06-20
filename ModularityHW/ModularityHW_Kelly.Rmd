@@ -4,10 +4,7 @@ author: "Michelle Kelly"
 date: "June 4, 2018"
 output: 
   pdf_document:
-    theme: yeti
     df_print: paged
-    toc: yes
-    number_sections: true
     fig_caption: yes
 ---  
 <!-- MODULARITY LESSON 8: have defined purpose for each Rmd chunk-->
@@ -24,32 +21,10 @@ library(maps)
 library(maptools)
 library(mapdata)
 library(viridis)
+library(cowplot)
 library(grid)
 library(gridExtra)
 ```
-
-***  
-
-# Abstract  
-
-(you will have to write this) climate change, long term trends, etc  
-
-***  
-
-# Introduction  
-
-research questions:  
-(1) can we see climate warming for ourselves by analyzing this data?  
-(2) in what parts of the country are temperatures getting warmer? are there parts of the country where temperatures became colder?  
-(3) can we say, based on this data, what change has occured in precipitation over the period?  
-
-***
-
-# Methods  
-
-***
-
-# Results  
 
 ```{r dataImport, echo=FALSE}
 # Dependencies: 
@@ -63,6 +38,26 @@ if (provided == TRUE){
   temp <- readRDS(file = "USAAnnualTemp1950_2008.rds") # annual temperature data for USA
 }
 ```
+
+# Abstract  
+
+(you will have to write this) climate change, long term trends, etc  
+
+# Introduction  
+
+  Average surface temperature on Earth has increased by 0.7&deg;C since the onset of the industrial era (UNFCC report 2007). Widespread fossil fuel use, and the following spike in atmospheric CO2, have acted as a global insulation blanket: trapping heat in the atmosphere and slowing it's release (Asfaw et al 2017). Increased temperatures are also impacting precipitation regimes; in the United States, increases in the severity of drought and flood events are expected (Dore, 2005). However, the impact of global change on a local level is expected to be more spatially heterogenous, with different regions of the US experiencing varied climate and precipitation responses (Trenberth 2011).  
+
+  We assess these expectations using 50 years of weather station data, asking (1) can climate warming be seen across the United States, (2) are the effects of climate warming regionally-dependent, and (3) what change has occured in precipitation?
+
+# Methods  
+
+  We used annualy averaged weather-station temperature (`r length(unique(temp$state))` states, `r length(unique(temp$name))` weather stations) and precipitation data (`r length(unique(precip$state))` states, `r length(unique(precip$name))` weather stations) from 1950 to 2008. Only weather stations with at least 40 years of measurement data were included in this analysis.
+
+  Yearly summary statistics were calculated by taking the mean observation within a state during any given year. To compare changes across time, a mean value for the duration of observations within a state was calculated, and subtracted from the annual value \ref{eq:1}. Therefore, negative values represent time periods when a state was experiencing below average temperatures, and positive values represent periods when a state was experiencing above average temperatures.  
+
+$\label{eq:1} Deviation from average_{state} = Annual average_{state} - Time series average_{state} $
+
+# Results  
 
 ```{r dataCleanup, echo=FALSE}
 # MODULARITY LESSON 1: variables, not constants
@@ -151,18 +146,6 @@ timeseries.change <- function(dataset_state){
 
 precip.timeseries.change <- timeseries.change(precip_state)
 temp.timeseries.change <- timeseries.change(temp_state)
-
-# data for mapping: plot mean deviation from average over last century of data (1998-2008) compared to mean deviation from average during 1950-1960
-temp.change <- function(dataset, minYear, maxYear){
-  dataset %>%
-    group_by(state, year) %>%
-    filter(year >= minYear & year <= maxYear) %>%
-    group_by(state) %>%
-    summarize(mean.change = mean(change)) 
-}
-
-temp.change.1950.1960 <- temp.change(temp_state, minYear = 1950, maxYear = 1960)
-temp.change.1998.2008 <- temp.change(temp_state, minYear = 1998, maxYear = 2008)
 ```
 
 
@@ -223,68 +206,65 @@ change (in)"),
 )
 ```
 
-```{r mapping, echo = FALSE}
-states <- map_data("state")
-
-# state data is formatted differently in each dataframe, we need this to match so we can join dataframes
-states$region <- toupper(states$region)
-setnames(states, "region", "state")
-
-# state.convert: using built-in r datasets to convert from state abbreviations to state names
-state.convert <- function(dataframe_column){
-  toupper(state.name[match(dataframe_column, state.abb)])
-}
-
-temp.change.1950.1960$state <- state.convert(temp.change.1950.1960$state)
-temp.change.1998.2008$state <- state.convert(temp.change.1998.2008$state)
-
-# join dataframes
-temp.change.1950.1960 <- inner_join(states, temp.change.1950.1960, by = "state")
-temp.change.1998.2008 <- inner_join(states, temp.change.1998.2008, by = "state")
-
-# plot the two datasets
-ggplot(data = temp.change.1950.1960) +
-  geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
-               color = "white") +
-  scale_fill_distiller(type = "div", palette = 7,
-                       name = "Temperature change (°F)   ") +
-  coord_fixed(1.3) +
-  theme_minimal()
-
-ggplot(data = temp.change.1998.2008) +
-  geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
-               color = "white") +
-  coord_fixed(1.3) +
-  scale_fill_distiller(limits = c(-2,2),
-                       type = "div", palette = 7, 
-                       name = "Temperature change (°F)   ") +
-  theme_classic() +
-  theme(legend.position = "bottom",
-        axis.title = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        axis.line = element_blank())
-
-mapping <- function(map_dataset, limit_vec){
-  ggplot(data = map_dataset) +
+```{r mapping, echo = FALSE, fig.width = 11, fig.height = 5, fig.cap="\\label{fig:figs}Average change in temperature over most recent decade (1998-2008), relative to 1950-2008 state average. "}
+# data for mapping: plot mean deviation from average over last century of data (1998-2008) compared to mean deviation from average during 1950-1960
+temp.change.map <- function(dataset_state, minYear, maxYear, axis_lims, legendPos){
+  dataset_state <- 
+    dataset_state %>%
+      group_by(state, year) %>%
+      filter(year >= minYear & year <= maxYear) %>%
+      group_by(state) %>%
+      summarize(mean.change = mean(change)) 
+  
+  states <- map_data("state") # pull state data from maps package
+  states$region <- toupper(states$region) # change character data to uppercase
+  setnames(states, "region", "state") # change column name
+  
+  dataset_state$state <- toupper(state.name[match(dataset_state$state, state.abb)])
+  
+  dataset_state <- inner_join(states, dataset_state, by = "state") # join dataframes
+  
+  # output map
+  ggplot(data = dataset_state) +
     geom_polygon(aes(x = long, y = lat, group = group, fill = mean.change), 
                  color = "white") +
     coord_fixed(1.3) +
-    scale_fill_distiller(limits = limit_vec, 
-                        type = "seq", palette = 7, direction = 1,
-                         name = "Temperature change (°F)   ") +
+    scale_fill_distiller(limits = axis_lims, type = "div", palette = 7,
+                         name = "Temperature 
+change
+relative to
+average (°F)
+") +
     theme_classic() +
-    theme(legend.position = "bottom",
+    ggtitle(paste(minYear, maxYear, sep = "-")) +
+    theme(legend.position = legendPos,
         axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         axis.line = element_blank())
 }
 
-mapping(temp.change.1998.2008, limit_vec = c(0,1.5))
+grid.arrange(
+  temp.change.map(temp_state, minYear = 1950, maxYear = 1960, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  temp.change.map(temp_state, minYear = 1960, maxYear = 1970, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  temp.change.map(temp_state, minYear = 1970, maxYear = 1980, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  temp.change.map(temp_state, minYear = 1980, maxYear = 1990, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  temp.change.map(temp_state, minYear = 1990, maxYear = 2000, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  temp.change.map(temp_state, minYear = 2000, maxYear = 2008, 
+                  axis_lims = c(-2,2), legendPos = "none"),
+  get_legend(temp.change.map(temp_state, minYear = 1950, maxYear = 1960, 
+                             axis_lims = c(-2,2), legendPos = "right")),
+  layout_matrix = rbind(c(1,2,3,7),
+                        c(4,5,6,7)),
+  widths = c(3,3,3,1), heights = c(2,2)
+)
 
 ```
-
 
 ```{r significance_testing, echo = FALSE}
 # significance testing: yearly means
