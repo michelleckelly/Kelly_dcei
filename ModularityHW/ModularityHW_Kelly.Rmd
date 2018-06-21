@@ -1,11 +1,11 @@
 ---
 title: "ModularityHW_Kelly"
 author: "Michelle Kelly"
-date: "June 4, 2018"
+date: "June 21, 2018"
 output: 
   pdf_document:
-    df_print: paged
     fig_caption: yes
+bibliography: Modularity_Citations.bib
 ---  
 <!-- MODULARITY LESSON 8: have defined purpose for each Rmd chunk-->
 ```{r setup, echo=FALSE, message=FALSE, error=FALSE, warning=FALSE}
@@ -38,26 +38,6 @@ if (provided == TRUE){
   temp <- readRDS(file = "USAAnnualTemp1950_2008.rds") # annual temperature data for USA
 }
 ```
-
-# Abstract  
-
-(you will have to write this) climate change, long term trends, etc  
-
-# Introduction  
-
-  Average surface temperature on Earth has increased by 0.7&deg;C since the onset of the industrial era (UNFCC report 2007). Widespread fossil fuel use, and the following spike in atmospheric CO2, have acted as a global insulation blanket: trapping heat in the atmosphere and slowing it's release (Asfaw et al 2017). Increased temperatures are also impacting precipitation regimes; in the United States, increases in the severity of drought and flood events are expected (Dore, 2005). However, the impact of global change on a local level is expected to be more spatially heterogenous, with different regions of the US experiencing varied climate and precipitation responses (Trenberth 2011).  
-
-  We assess these expectations using 50 years of weather station data, asking (1) can climate warming be seen across the United States, (2) are the effects of climate warming regionally-dependent, and (3) what change has occured in precipitation?
-
-# Methods  
-
-  We used annualy averaged weather-station temperature (`r length(unique(temp$state))` states, `r length(unique(temp$name))` weather stations) and precipitation data (`r length(unique(precip$state))` states, `r length(unique(precip$name))` weather stations) from 1950 to 2008. Only weather stations with at least 40 years of measurement data were included in this analysis.
-
-  Yearly summary statistics were calculated by taking the mean observation within a state during any given year. To compare changes across time, a mean value for the duration of observations within a state was calculated, and subtracted from the annual value \ref{eq:1}. Therefore, negative values represent time periods when a state was experiencing below average temperatures, and positive values represent periods when a state was experiencing above average temperatures.  
-
-$\label{eq:1} Deviation from average_{state} = Annual average_{state} - Time series average_{state} $
-
-# Results  
 
 ```{r dataCleanup, echo=FALSE}
 # MODULARITY LESSON 1: variables, not constants
@@ -92,6 +72,26 @@ cleanByYear <- function(dataframe, nYears){
 precip <- cleanByYear(precip, minYears)
 temp <- cleanByYear(temp, minYears)
 ```
+
+# Introduction  
+
+  Average surface temperature on Earth has increased by 0.7&deg;C since the onset of the industrial era [@UnitedNationsFrameworkConventiononClimateChange2007]. Widespread fossil fuel use, and the following spike in atmospheric CO2, have acted as a global insulation blanket: trapping heat in the atmosphere and slowing it's release [@Asfaw2017]. Increased temperatures are also impacting precipitation regimes; in the United States, increases in the severity of drought and flood events are expected [@Dore2005]. However, the impact of global change on a local level is expected to be more spatially heterogenous, with different regions of the US experiencing varied climate and precipitation responses [@Trenberth2011].  
+
+  We assess these expectations using `r minYears` years of weather station data, asking (1) can climate warming be seen across the United States, (2) are the effects of climate warming regionally-dependent, and (3) what change has occured in precipitation?
+
+# Methods  
+
+  We used annualy averaged weather-station temperature (`r length(unique(temp$state))` states, `r length(unique(temp$name))` weather stations) and precipitation data (`r length(unique(precip$state))` states, `r length(unique(precip$name))` weather stations) from `r min(temp$year)` to `r max(temp$year)`. Only weather stations with at least `r minYears` years of measurement data were included in this analysis.
+
+  Yearly summary statistics were calculated by taking the mean observation within a state during any given year. To compare changes across time, a mean value for the duration of observations within a state was calculated, and subtracted from the annual value \ref{eq-dev}. 
+\begin{equation}
+\label{eq-dev}
+Deviation  from  average_{state} = Annual  average_{state} - Time  series  average_{state}
+\end{equation}
+
+Therefore, negative values represent time periods when a state was experiencing below average temperatures, and positive values represent periods when a state was experiencing above average temperatures.  
+
+# Results and Discussion  
 
 ```{r dataAnalysis, echo = FALSE}
 # yearlyStatistics: mean data across USA for each year
@@ -148,22 +148,6 @@ precip.timeseries.change <- timeseries.change(precip_state)
 temp.timeseries.change <- timeseries.change(temp_state)
 ```
 
-
-```{r dataVis_overallPlot, echo=FALSE, include=FALSE}
-# yearlyPlot: simple plot of yearly means, with added trendline
-yearlyPlot <- function(dataset, ylabel, ...){
-  ggplot(data = dataset, aes(x = year, y = mean, ...)) +
-  geom_line() + geom_point() +
-  geom_smooth(method = "lm") +
-  xlab("Year") + ylab(ylabel) +
-  theme_classic()
-}
-
-yearlyPlot(precip_summary, ylabel = "Yearly averaged precipitation (in)")
-yearlyPlot(temp_summary, ylabel = "Yearly averaged temperature (F)")
-
-```
-
 ```{r dataVis_functions, echo = FALSE}
 # heatmap: visualization of change through time using colored tiles
 heatmap <- function(dataset, legendlabel, ...){
@@ -188,25 +172,25 @@ change.barplot <- function(dataset_state, ylabel, col_number, ...){
 }
 ```
 
-```{r heatmap_temp, echo=FALSE, fig.width = 12, fig.height = 5, fig.cap="\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
+```{r significance_testing, echo = FALSE, warning = FALSE, message = FALSE}
+# significance testing: yearly means
+sigtest_precip <- lm(precip_summary$mean ~ precip_summary$year)
+summary(sigtest_precip) # not signif
 
-# Anomalies in annual mean temperature, relative to 1950-2008 state average
-heatmap(temp_state, legendlabel = "Temperature change (°F)")
+sigtest_temp <- lm(temp_summary$mean ~ temp_summary$year)
+summary(sigtest_temp) # not signif
+
+# significance testing: change by state
+temp_lm <- summary(lm(temp_state$change ~ temp_state$year)) # signif
+temp_lm_pval <- temp_lm$coefficients
+
+precip_lm <- summary(lm(precip_state$change ~ precip_state$year)) #signif
+precip_lm_pval <- precip_lm$coefficients
 ```
 
-```{r heatmap_precip, echo=FALSE, fig.width = 15, fig.height = 5, fig.cap="\\label{fig:figs}Anomalies in annual precipitation, relative to 1950-2008 state average"}
+We see that deviations in temperature from local averages have generally increased from 1950-2008 (p-value < 0), with rapid increases from 1980 onwards \ref{fig:mapping}. However, warming has not been homogenous across the USA: states at northern latitudes and those located in the American Southwest have experienced more extreme effects.
 
-# Anomalies in annual precipitation, relative to 1950-2008 state average
-grid.arrange(
-  heatmap(precip_state, legendlabel = "Precipitation 
-change (in)"),
-  change.barplot(precip_state, ylabel = "Precipitation change (in)", col_number = 3),
-  layout_matrix = rbind(c(1,2,2,2),
-                        c(1,2,2,2))
-)
-```
-
-```{r mapping, echo = FALSE, fig.width = 11, fig.height = 5, fig.cap="\\label{fig:figs}Average change in temperature over most recent decade (1998-2008), relative to 1950-2008 state average. "}
+```{r mapping, echo = FALSE, fig.width = 11, fig.height = 5, fig.cap="\\label{fig:mapping}Change in temperature per decade, relative to 1950-2008 state average."}
 # data for mapping: plot mean deviation from average over last century of data (1998-2008) compared to mean deviation from average during 1950-1960
 temp.change.map <- function(dataset_state, minYear, maxYear, axis_lims, legendPos){
   dataset_state <- 
@@ -266,33 +250,51 @@ grid.arrange(
 
 ```
 
-```{r significance_testing, echo = FALSE}
-# significance testing: yearly means
-sigtest_precip <- lm(precip_summary$mean ~ precip_summary$year)
-summary(sigtest_precip) # not signif
+We know that the Earth has undergone two main periods of warming within the last century, one from 1910 and 1945, and the other from 1976 to present day [@Walther2002]. These results support the latter half of that assessment. It is also expected that the 
 
-sigtest_temp <- lm(temp_summary$mean ~ temp_summary$year)
-summary(sigtest_temp) # not signif
+```{r heatmap_precip, echo=FALSE, fig.width = 15, fig.height = 5, fig.cap="\\label{fig:heatmap_precip}Anomalies in annual precipitation, relative to 1950-2008 state average"}
 
-# significance testing: change by state
-summary(lm(temp_state$change ~ temp_state$year)) # signif
-
-summary(lm(precip_state$change ~ precip_state$year)) #signif
+# Anomalies in annual precipitation, relative to 1950-2008 state average
+grid.arrange(
+  heatmap(precip_state, legendlabel = "Precipitation 
+change (in)"),
+  change.barplot(precip_state, ylabel = "Precipitation change (in)", col_number = 3),
+  layout_matrix = rbind(c(1,2,2,2),
+                        c(1,2,2,2))
+)
 ```
 
-# Discussion
+Precipitation dynamics have changed from `r min(temp$year)` to `r max(temp$year)` (p-value = `r precip_lm_pval`). Visually, we can see that there are both intense "high" and "low" years (that is, a potential increase in flood and drought events) \ref{fig:heatmap_precip}. To further investigate this phenomenon, we could use United States Geological Survey (USGS) river discharge data as an additional flood and drought predictor. It is not clear by this analysis alone whether location is a predictor of precipitation change. A finer scale (county level) analysis may be useful.
+
+We have determined that climate warming from `r min(temp$year)` to `r max(temp$year)` is highly visually apparent. Generally, the southwest and upper midwest regions are experiencing the most warming, while the southern and southwest regions experienced colder than average temperatures during 1960-1980.  
 
 # References
 
 # Supplemental
 
-```{r barplot_temp, echo = FALSE, fig.width = 17, fig.height = 17, fig.cap = "\\label{fig:figs}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
+```{r barplot_temp, echo = FALSE, fig.width = 17, fig.height = 17, fig.cap = "\\label{fig:barplot_temp}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
 change.barplot(temp_state, ylabel = "Temperature change (°F)", col_number = 5)
 ```
 
+```{r dataVis_overallPlot, echo=FALSE, include=FALSE}
+# yearlyPlot: simple plot of yearly means, with added trendline
+yearlyPlot <- function(dataset, ylabel, ...){
+  ggplot(data = dataset, aes(x = year, y = mean, ...)) +
+  geom_line() + geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Year") + ylab(ylabel) +
+  theme_classic()
+}
 
+yearlyPlot(precip_summary, ylabel = "Yearly averaged precipitation (in)")
+yearlyPlot(temp_summary, ylabel = "Yearly averaged temperature (F)")
+```
 
+```{r heatmap_temp, echo=FALSE, include = FALSE, fig.width = 12, fig.height = 5, fig.cap="\\label{fig:heatmap_temp}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
 
+# Anomalies in annual mean temperature, relative to 1950-2008 state average
+heatmap(temp_state, legendlabel = "Temperature change (°F)")
+```
 
 
 
