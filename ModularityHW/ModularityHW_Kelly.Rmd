@@ -274,7 +274,7 @@ In summary, we have determined that climate warming from `r min(temp$year)` to `
 \pagebreak 
 
 # Supplemental
-
+<!-- MODULARITY LESSON 3: Rewriting/revising your code can be good and important, and should not depress you, see unused plot here and many many versions on git -->
 ```{r barplot_temp, echo = FALSE, fig.height = 18, fig.cap = "\\label{fig:barplot_temp}Anomalies in annual mean temperature, relative to 1950-2008 state average"}
 change.barplot(temp_state, ylabel = "Temperature change (°F)", col_number = 5)
 ```
