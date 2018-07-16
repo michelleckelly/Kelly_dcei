@@ -44,6 +44,7 @@ dataLoad <- function(start.date = NULL, end.date = NULL){
     #   00060 = discharge, ft^3/s
     #   00300 = dissolved oxygen, mg/L
     #   00301 = dissolved oxygen, percent saturation
+    #   = 
     parameter.codes <- c("00010", "00060", "00300", "00301")
     #
     # call to API to pull data
