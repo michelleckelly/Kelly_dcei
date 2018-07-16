@@ -5,3 +5,52 @@ date: "July 16, 2018"
 output: html_document
 ---
 
+```{r dataLoad_source}
+source("dataLoad.R")
+```
+
+```{r dataLoad_input_test_1}
+# if local file does not exist, but start/end date is not specified, script returns error
+#
+# Pseudocode:
+#
+# if (local file exists){
+#   delete or rename local file so script doesnt recognize it
+# }
+#
+# output <- dataLoad()
+#
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+```
+
+```{r dataLoad_input_test_2}
+# if start and end date are not contained within available PAR data, script returns error
+#
+# Pseudocode:
+#
+startdate <- ymd_hms("2006-01-01 00:00:00")
+enddate <- ymd_hms("2018-01-01 00:00:00")
+# output <- dataload()
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+```
+
+```{r dataLoad_output_test_1}
+# test if the output of dataLoading has the correct classes
+#
+# run dataLoad function, its fine if local file exists
+#
+# check classes using lapply(dataframe, class)
+# if (classes are what you expect){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+```
