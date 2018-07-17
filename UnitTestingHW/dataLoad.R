@@ -19,20 +19,13 @@
 #         specified, return error message asking for date specification
 #         can also add this check to Tests.Rmd
 
-sitecode <- "11337190"
-nickname <- "CA_JerseyPoint"
-filepath <- "./data_files/CA_SacramentoR.csv"
-lat <- "38.257778"
-long <- "-121.517222"
-tz <- "America/Los_Angeles"
-
 dataLoad <- function(filepath, lat, long, tz){
   # add safety checks here:
   #
   # if (!file.exists()){
   #   return error
   #}
-  if(file.exists(filepath)){
+  #if(file.exists(filepath)){
     # load data from filepath specified
     data <- read.csv(filepath, header = TRUE)
     #
@@ -58,5 +51,5 @@ dataLoad <- function(filepath, lat, long, tz){
     #
     # return dataframe and exit function
     return(data)
-  }
+  #}
 }

@@ -45,26 +45,27 @@ source("dataLoad.R")
 sitecode <- "06892350" 
 nickname <- "KansasR_DesotoKS"
 
-# Menominee R near McAllister, WI
-sitecode_WI <- "04067500"
-nickname_WI <- "WI_Menominee"
-
-# San Joaquin R near Jersey Point, CA
-sitecode_CA <- "11337190"
-nickname_CA <- "CA_JerseyPoint"
-
-
 # loading CA sacramento data
-filepath_CA <- "./data_files/CA_SacramentoCA.csv"
+filepath_CA <- "./data_files/CA_SacramentoR.csv"
 lat_CA <- "38.257778"
 long_CA <- "-121.517222"
+tz_CA <- "America/Los_Angeles"
+CA_SacramentoR <- dataLoad(filepath = filepath_CA, lat = lat_CA, long = long_CA, tz = tz_CA)
+
+# small and probabaly forested: loading CT data (smaller, forested)
+filepath_CT <- "./data_files/CT_NorthBranchParkR.csv"
+lat_CT <- "41.784439"
+long_CT <- "-72.708056"
+tz_CT <- "America/New_York"
+CA_NorthBranch <- dataLoad(filepath = filepath_CT, lat = lat_CT, long = long_CT, tz = tz_CT)
+
+# tropical.... florida?
+# cold or streammelt controlled
+
+# agriculturally dominated: Mississippi R at Clinton IA
+# gage # 05420500
 
 
-# pull data for one year period
-startdate <- ymd_hms("2017-01-01 00:00:00")
-enddate <- ymd_hms("2017-12-31 00:00:00")
-
-WI_Menominee <- dataLoad(sitecode_CA, nickname_CA, startdate, enddate)
 
 # check that data is correct classes with tests.Rmd
 ```
