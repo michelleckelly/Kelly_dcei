@@ -22,9 +22,6 @@ library(imputeTS)
 ```
 
 # Introduction  
-
-
-
 # Methods  
 # Results  
 
@@ -52,15 +49,18 @@ startdate <- ymd_hms("2016-01-01 00:00:00")
 enddate <- ymd_hms("2018-01-01 00:00:00")
 
 kansasR <- dataLoad(sitecode, nickname, startdate, enddate)
+data <- kansasR
 # check that data is correct classes with tests.Rmd
 ```
 
 ```{r modeling, cache = TRUE}
-# IF latitude and longitude is specified, we can estimate PAR based on time. use this for thi s project so you can expland date range (only have 2 yrs of PAR data)
+source("metabolismModeling.R")
 
-# modeling function starts here
-
-
+metab_kansasR <- metabolismModeling(kansasR)
+plot(x = metab_kansasR[["predictions"]][["date"]], y = metab_kansasR[["predictions"]][["GPP"]],
+     ylim = c(-20,50))
+plot(x = metab_kansasR[["predictions"]][["date"]], y = metab_kansasR[["predictions"]][["ER"]],
+     ylim = c(-20,50))
 ```
 
 ```{r plotting}

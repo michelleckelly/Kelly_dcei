@@ -16,10 +16,13 @@
 #library(StreamPULSE)
 #library(streamMetabolizer)
 
-metabolismModeling <- function(data, na.fill = "interpolation", lat, long){
+metabolismModeling <- function(data, na.fill = "interpolation"){
   # model will be broken by NA values, therefore
   # fill in NA gaps with imputeTS::na.seasplit according to algorithm of choice
-  data <- imputeTS::na.seasplit(data, algorithm = na.fill)
+  data$WaterTemp_C <- imputeTS::na.seasplit(data$WaterTemp_C, algorithm = na.fill)
+  data$Discharge_m3s <- imputeTS::na.seasplit(data$Discharge_m3s, algorithm = na.fill)
+  data$DO_mgL <- imputeTS::na.seasplit(data$DO_mgL, algorithm = na.fill)
+  data$DOsat_pct <- imputeTS::na.seasplit(data$DOsat_pct, algorithm = na.fill)
   #
   # model will be broken by discharge values that are negative or 0, therefore
   if(any(na.omit(data$Discharge_m3s) <= 0)){
@@ -43,7 +46,7 @@ metabolismModeling <- function(data, na.fill = "interpolation", lat, long){
                                                          latitude = data$Lat,
                                                          format = "degrees")
   # let user know that PAR was estimated based on latitude and time
-  cat("PAR estimated based on latitude and time data.\n")
+  cat("PAR estimated based on latitude and time.\n")
   #
   # estimate depth (m) from discharge data
   data$depth <- streamMetabolizer::calc_depth(data$Discharge_m3s)
@@ -64,26 +67,12 @@ metabolismModeling <- function(data, na.fill = "interpolation", lat, long){
   fitdata <- dplyr::select_(data, .dots = model_variables)
   modelname <- streamMetabolizer::mm_name(type='mle', ode_method = "trapezoid")
   modelspecs <- streamMetabolizer::specs(modelname)
+  cat("Using a maximum likelihood estimation (MLE) method to fit your metabolism model.\n")
   # run the model
   modelfit <- streamMetabolizer::metab(modelspecs, data = fitdata)
-  return(modelfit)
-  plot(modelfit@metab_daily$GPP)
-  #
-  # fit the model to the data (time consuming step, perhaps use MLE model for class project)
-  #
+  # extract predictions
+  predictions <- streamMetabolizer::predict_metab(modelfit)
   # return model results
+  output <- list(predictions = predictions, fit = modelfit)
+  return(output)
 }
-
-
-
-
-# convert UTC to solar time
-kansasR$solar.time <- convert_UTC_to_solartime(date.time = dataset$dateTime,
-                                               longitude = long,
-                                               time.type = "mean solar")
-
-
-plot(kansasR$Discharge_m3s)
-plot(kansasR1$Discharge_m3s)
-
-kansasR <- as.list(kansasR)

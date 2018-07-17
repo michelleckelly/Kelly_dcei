@@ -30,7 +30,7 @@ dataLoad <- function(sitecode, nickname, startdate = NULL, enddate = NULL){
     # if local file exists, load local file
     data <- read.csv(paste0("./data_files/MetabolismData_", nickname, ".csv"), header = TRUE)
     # check that dateTime is in proper format
-    data$dateTime <- ymd_hms(data$dateTime, tz = "America/Chicago")
+    data$dateTime <- ymd_hms(data$dateTime, tz = "UTC")
     # return dataframe and exit function
     return(data)
   }
@@ -61,7 +61,7 @@ dataLoad <- function(sitecode, nickname, startdate = NULL, enddate = NULL){
     data <- data[, c("Lat", "Long", "dateTime", "WaterTemp_C", "Discharge_m3s", 
                      "DO_mgL", "DOsat_pct")]
     # format dateTime, time zone is UTC
-    data$dateTime <- ymd_hms(data$dateTime)
+    data$dateTime <- ymd_hms(data$dateTime, tz = "UTC")
     #
     # convert units from cubic foot per second to m3 per second
     ft3s_m3s <- function(ft3s){
