@@ -19,6 +19,7 @@ library(dataRetrieval)
 library(StreamPULSE)
 library(streamMetabolizer)
 library(imputeTS)
+library(ggplot2)
 ```
 
 # Introduction  
@@ -44,25 +45,41 @@ source("dataLoad.R")
 sitecode <- "06892350" 
 nickname <- "KansasR_DesotoKS"
 
-# pull data for a two year period. Full project will use data from a four year period
-startdate <- ymd_hms("2016-01-01 00:00:00")
-enddate <- ymd_hms("2018-01-01 00:00:00")
+# Menominee R near McAllister, WI
+sitecode_WI <- "04067500"
+nickname_WI <- "WI_Menominee"
 
-kansasR <- dataLoad(sitecode, nickname, startdate, enddate)
-data <- kansasR
+# San Joaquin R near Jersey Point, CA
+sitecode_CA <- "11337190"
+nickname_CA <- "CA_JerseyPoint"
+
+
+# loading CA sacramento data
+filepath_CA <- "./data_files/CA_SacramentoCA.csv"
+lat_CA <- "38.257778"
+long_CA <- "-121.517222"
+
+
+# pull data for one year period
+startdate <- ymd_hms("2017-01-01 00:00:00")
+enddate <- ymd_hms("2017-12-31 00:00:00")
+
+WI_Menominee <- dataLoad(sitecode_CA, nickname_CA, startdate, enddate)
+
 # check that data is correct classes with tests.Rmd
 ```
 
 ```{r modeling, cache = TRUE}
 source("metabolismModeling.R")
-
 metab_kansasR <- metabolismModeling(kansasR)
-plot(x = metab_kansasR[["predictions"]][["date"]], y = metab_kansasR[["predictions"]][["GPP"]],
-     ylim = c(-20,50))
-plot(x = metab_kansasR[["predictions"]][["date"]], y = metab_kansasR[["predictions"]][["ER"]],
-     ylim = c(-20,50))
+
+metab_WI <- metabolismModeling(WI_Menominee)
 ```
 
 ```{r plotting}
 # have a very short function that plots
+source("metabolismPlot.R")
+metabolismPlot(metab_kansasR)
+
+metabolismPlot(metab_WI)
 ```
