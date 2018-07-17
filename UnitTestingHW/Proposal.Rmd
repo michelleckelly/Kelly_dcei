@@ -6,19 +6,19 @@ output: pdf_document
 ---
 
 ```{r setup}
-library(lubridate)
-library(dataRetrieval)
-
-library(StreamPULSE)
-library(streamMetabolizer)
-
-# grab streamPULSE pipeline tools
+# streamPULSE pipeline tools
 #library(devtools)
 #install_github('streampulse/StreamPULSE', dependencies=TRUE)
 
-# grab latest version of streamMetabolizer
+# Latest version of streamMetabolizer
 #install.packages("streamMetabolizer", dependencies = TRUE, 
 #                 repos = c("https://owi.usgs.gov/R", "https://cran.rstudio.com"))
+
+library(lubridate)
+library(dataRetrieval)
+library(StreamPULSE)
+library(streamMetabolizer)
+library(imputeTS)
 ```
 
 # Introduction  
@@ -38,12 +38,20 @@ list of function scripts
 dataPull.R (format just for USGS sites, return just data needed for metabolism, test that the data has correct classes)
 
 ```{r data.import, cache = TRUE}
+# for this proposal, pull one USGS site
+# full project will do comparison between sites of different conditions: tropical rivers, artic rivers, heavy agricultural rivers, arid rivers
+
 source("dataLoad.R")
 
+# Kansas River at Desoto, KS
+sitecode <- "06892350" 
+nickname <- "KansasR_DesotoKS"
+
+# pull data for a two year period. Full project will use data from a four year period
 startdate <- ymd_hms("2016-01-01 00:00:00")
 enddate <- ymd_hms("2018-01-01 00:00:00")
 
-kansasR <- dataLoad(startdate, enddate)
+kansasR <- dataLoad(sitecode, nickname, startdate, enddate)
 # check that data is correct classes with tests.Rmd
 ```
 

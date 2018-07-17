@@ -28,18 +28,7 @@ source("dataLoad.R")
 ```
 
 ```{r dataLoad_input_test_2}
-# if start and end date are not contained within available PAR data, script returns error
-#
-# Pseudocode:
-#
-startdate <- ymd_hms("2006-01-01 00:00:00")
-enddate <- ymd_hms("2018-01-01 00:00:00")
-# output <- dataload()
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
+
 ```
 
 ```{r dataLoad_output_test_1}
