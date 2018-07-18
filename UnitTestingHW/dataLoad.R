@@ -30,8 +30,8 @@ dataLoad <- function(filepath, lat, long, tz){
     data <- read.csv(filepath, header = TRUE)
     #
     # add columns of site latitude and longitude
-    data$Lat <- lat
-    data$Long <- long
+    data$Lat <- as.numeric(lat)
+    data$Long <- as.numeric(long)
     #
     # convert dateTime from local timezone to UTC
     data$dateTime_Local <- mdy_hm(data$dateTime, tz = tz)
