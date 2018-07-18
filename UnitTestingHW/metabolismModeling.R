@@ -17,7 +17,7 @@ metabolismModeling <- function(data){
   modelspecs <- streamMetabolizer::specs(modelname)
   cat("Using a maximum likelihood estimation (MLE) method to fit your metabolism model.\n")
   # run the model
-  modelfit <- streamMetabolizer::metab(modelspecs, data = fitdata)
+  modelfit <- streamMetabolizer::metab(modelspecs, data = data)
   # extract predictions
   predictions <- streamMetabolizer::predict_metab(modelfit)
   # return model results
