@@ -7,9 +7,8 @@
 # tz               character vector of the time zone, as recognized by OlsonNames()
 # 
 # Output
-#                   dataframe of stream data (discharge, water temperature, 
-#                   dissolved oxygen, photosynthetically active radiation) from USGS sensor
-#                   site
+# data             dataframe of stream data (discharge, water temperature, dissolved oxygen, 
+#                  photosynthetically active radiation) from USGS sensor site
 #
 # Dependencies
 # library(lubridate)
