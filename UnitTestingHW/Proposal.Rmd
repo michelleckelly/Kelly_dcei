@@ -15,7 +15,7 @@ output: pdf_document
 #                 repos = c("https://owi.usgs.gov/R", "https://cran.rstudio.com"))
 
 library(lubridate)
-library(dataRetrieval)
+#library(dataRetrieval)
 library(StreamPULSE)
 library(streamMetabolizer)
 library(imputeTS)
@@ -24,16 +24,14 @@ library(ggplot2)
 
 # Introduction  
 # Methods  
+- describe USGS data and how you collected it
+- description of why certain sites were chosen  
+- description of methods used to model metabolism
 # Results  
-
-should have some preliminary results
-
+- present results of modeling from one site as a preliminary result
 # Discussion  
-
-a discussion of the preliminary results, and plans for the final project
-
-list of function scripts
-dataPull.R (format just for USGS sites, return just data needed for metabolism, test that the data has correct classes)
+- connect the results back to metabolism regime work done by bernhardt et al 2018, etc
+- describe plans for final project
 
 ```{r data.import, cache = TRUE}
 # for this proposal, pull one USGS site
@@ -41,34 +39,36 @@ dataPull.R (format just for USGS sites, return just data needed for metabolism, 
 
 source("dataLoad.R")
 
-# Kansas River at Desoto, KS
-sitecode <- "06892350" 
-nickname <- "KansasR_DesotoKS"
-
-# loading CA sacramento data
+# large, aseasonal, little canopy cover: loading CA sacramento data
 filepath_CA <- "./data_files/CA_SacramentoR.csv"
 lat_CA <- "38.257778"
 long_CA <- "-121.517222"
 tz_CA <- "America/Los_Angeles"
 CA_SacramentoR <- dataLoad(filepath = filepath_CA, lat = lat_CA, long = long_CA, tz = tz_CA)
 
-# small and probabaly forested: loading CT data (smaller, forested)
+# small, seasonal, and forested: loading CT data
 filepath_CT <- "./data_files/CT_NorthBranchParkR.csv"
 lat_CT <- "41.784439"
 long_CT <- "-72.708056"
 tz_CT <- "America/New_York"
-CA_NorthBranch <- dataLoad(filepath = filepath_CT, lat = lat_CT, long = long_CT, tz = tz_CT)
+CT_NorthBranch <- dataLoad(filepath = filepath_CT, lat = lat_CT, long = long_CT, tz = tz_CT)
 
-# tropical.... florida?
-# cold or streammelt controlled
-
-# agriculturally dominated: Mississippi R at Clinton IA
+# large, seasonal, agriculturally dominated: Mississippi R at Clinton IA
 # gage # 05420500
-
-
+filepath_IA <- "./data_files/IA_MississippiR.csv"
+lat_IA <- "41.780556"
+long_IA <- "-90.251944"
+tz_IA <- "America/Chicago"
+IA_MississipiR <- dataLoad(filepath = filepath_IA, lat = lat_IA, long = long_IA, tz = tz_IA)
 
 # check that data is correct classes with tests.Rmd
+str(IA_MississipiR)
 ```
+
+```{r dataPrep}
+# add in data prep function: limit error by re-formatting and interpolating points in a seperate step
+```
+
 
 ```{r modeling, cache = TRUE}
 source("metabolismModeling.R")
