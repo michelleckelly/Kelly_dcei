@@ -1,4 +1,4 @@
-# load local datafile and reformat to pipe to metabolismModeling.R
+# load local datafile, transform local time to UTC time, convert from American to SI units, and then return data to user
 # 
 # Arguments
 # filepath         character vector, file path to river data
