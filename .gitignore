@@ -10,6 +10,10 @@
 # Ignore Rmd default cache directory
 /cache/
 
+# Ignore Rmd files for Proposal
+/UnitTestingHW/Proposal_files/
+/UnitTestingHW/Proposal_cache/
+
 # Ignore any temp files that are created by Rmd
 *.utf9.md
 *.knit.md
