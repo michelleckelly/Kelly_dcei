@@ -25,29 +25,23 @@ library(ggplot2)
 
 # Introduction  
 
-The root of all ecosystems is the sun - and the organisms that harness it's energy. Solar energy provides the fuel that primary producers require, using photosynthesis to transform water and carbon dioxide into metabolizable carbon products... (introduce this as metabolism)  
-The conversion rate of solar energy to organic energy is termed gross primary productivity (GPP). The consumption of organic energy, by both autotrophs and heterotrophs, is termed ecosystem respiration (ER). The balance between GPP and ER is referred to as net ecosystem production (NEP), and can ultimately be used as an indicatior of whether a system is retaining or losing carbon.  
-
-The metabolism of terrestrial ecosystems often follows an annual pattern. GPP and NEP usually peak during warm, wet summer months, when conditions are most favorable for photosynthetic growth. Lakes also tend to have peak GPP and NEP in summer, when water is warmest, light availability is greatest, and dissolved nutrient concentrations tend to be greatest.  
-
-In rivers and streams, this pattern doesn't always hold up. Often, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Furthermore, high flow events, caused by rain or snowmelt, scour autotrophs from the streambed. Frequent removal of algae, moss, and macrophytes prevents GPP from reaching theoretical potential. Rivers also recieve considerable carbon input from surrounding terrestrial sources (leaf litter in Fall, organic matter from surrounding watershed). Terrestial carbon input can be equal to or exceed GPP, blurring the seasonal patterns of GPP and ER.  
+Without photosynthesis, Earth's ecosystems would collapse. Primary producers' conversion of solar energy, water, and carbon dioxide into metabolize sugars forms the foundation of the trophic ladder: supporting both producers and consumers. The conversion rate of solar energy to organic energy within an ecosystem is termed gross primary productivity (GPP), and can be measured as oxygen produced per day. The consumption of this organic energy, by both autotrophs and heterotrophs, is termed ecosystem respiration (ER). The balance between GPP and ER is referred to as net ecosystem production (NEP), and can ultimately be used as an indicator of whether an ecosystem is retaining or losing carbon.  
 
 ```{r bernhardt, echo = FALSE, fig.cap="Conceptual yearly hydrographs for rivers experiencing aseasonal rain dynamics, a mid-year monsoon season, and a spring snowmelt (adapted from Bernhardt et al 2018). \\label{bernhardt}", out.height="20%", fig.align = "center"}
 knitr::include_graphics("Proposal_images/Bernhardt2018.png")
 ```
 
-However, all rivers are not created equal. As stream size increases, GPP is less effected by canopy cover and terrestrial carbon input, and their metabolic regimes more closely resemble that of lakes and terrestrial systems. Less is known about the metabolic regimes of aseasonal, tropical systems, where growing conditions may be favorable all year round. [Figure \ref{vannote}].  
+In terrestrial systems, NEP often follows a predictable annual cycle. GPP and NEP tend to peak during warm, wet summer months, when conditions are most favorable for photosynthetic growth. Primary production in lakes usually syncs up with the terrestrial cycle; greater light availability, higher water temperatures, and availible dissolved nutrients create the ideal coctail for algae, moss, and macrophyte growth.  
+
+However, primary production in rivers and streams doesn't often correlate with the terrestrial growing season. In small streams, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Variations in stream flow, which can be caused by rain events, snowmelt, or drought, scour or dessicate stream beds, reducing the biomass of primary producers. Stream hydrology can follow a yearly pattern, but vary widely between biomes [Figure \ref{bernhardt}]. Furthermore, reaches may also recieve a significant carbon input from non-aquatic sources, such as an influx of leaf litter during Autumn, or the flushing of soil-bound organic matter during rain events. Carbon input from terrestrial sources can equal or exceed yearly GPP, blurring the seasonal pattern of GPP and ER.  
+
+As stream size increases, ecosystem productivity is less effected by reach morphology, and more closely follows the terrestrial growing system. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes *Citation*. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter *Citation*.  
 
 ```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al 1980). \\label{vannote}", out.height="30%", fig.align='center'}
 knitr::include_graphics("Proposal_images/Vannote1980_edit.png")
 ```
 
-
-- change this to making predictions based on river characteristics
-- explain why investigating metabolism is important  
-- propose some study questions:
-- can we see a "metabolic signature" of river characteristics (such as stream size, temperature, canopy cover, ) in this data?
-- can we determine what controls the variation and magnitude of productivity within these rivers?  
+Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic regimes", suggesting dominant annual patterns of GPP and ER dynamics for river ecosystems subjected to varying physical and biochemical conditions (2018). We propose to "ground-truth" the metabolism regime concept by asking *(1)* if we hold the effects of latitude constant, can we see these patterns in real stream data, and *(2)* can we see a common "signature" of a local condition (such as disturbance, stream size, or land use) in a metabolism model?  
 
 # Methods  
 - describe USGS data and how you collected it
