@@ -2,7 +2,9 @@
 title: "Data Carpentry: Final Project Proposal"
 author: "Michelle Kelly"
 date: "July 16, 2018"
-output: pdf_document
+output: 
+  pdf_document:
+    fig_caption: true
 ---
 
 ```{r setup, echo = FALSE, warning = FALSE, message = FALSE}
@@ -24,26 +26,28 @@ library(ggplot2)
 # Introduction  
 
 The root of all ecosystems is the sun - and the organisms that harness it's energy. Solar energy provides the fuel that primary producers require, using photosynthesis to transform water and carbon dioxide into metabolizable carbon products... (introduce this as metabolism)  
-
 The conversion rate of solar energy to organic energy is termed gross primary productivity (GPP). The consumption of organic energy, by both autotrophs and heterotrophs, is termed ecosystem respiration (ER). The balance between GPP and ER is referred to as net ecosystem production (NEP), and can ultimately be used as an indicatior of whether a system is retaining or losing carbon.  
 
 The metabolism of terrestrial ecosystems often follows an annual pattern. GPP and NEP usually peak during warm, wet summer months, when conditions are most favorable for photosynthetic growth. Lakes also tend to have peak GPP and NEP in summer, when water is warmest, light availability is greatest, and dissolved nutrient concentrations tend to be greatest.  
 
 In rivers and streams, this pattern doesn't always hold up. Often, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Furthermore, high flow events, caused by rain or snowmelt, scour autotrophs from the streambed. Frequent removal of algae, moss, and macrophytes prevents GPP from reaching theoretical potential. Rivers also recieve considerable carbon input from surrounding terrestrial sources (leaf litter in Fall, organic matter from surrounding watershed). Terrestial carbon input can be equal to or exceed GPP, blurring the seasonal patterns of GPP and ER.  
 
-However, all rivers are not created equal. As stream size increases, GPP is less effected by canopy cover and terrestrial carbon input, and their metabolic regimes more closely resemble that of lakes and terrestrial systems. Less is known about the metabolic regimes of aseasonal, tropical systems, where growing conditions may be favorable all year round.  
+```{r bernhardt, echo = FALSE, fig.cap="Conceptual yearly hydrographs for rivers experiencing aseasonal rain dynamics, a mid-year monsoon season, and a spring snowmelt (adapted from Bernhardt et al 2018). \\label{bernhardt}", out.height="20%", fig.align = "center"}
+knitr::include_graphics("Proposal_images/Bernhardt2018.png")
+```
 
-- change this to making predictions based on river characteristics  
+However, all rivers are not created equal. As stream size increases, GPP is less effected by canopy cover and terrestrial carbon input, and their metabolic regimes more closely resemble that of lakes and terrestrial systems. Less is known about the metabolic regimes of aseasonal, tropical systems, where growing conditions may be favorable all year round. [Figure \ref{vannote}].  
+
+```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al 1980). \\label{vannote}", out.height="30%", fig.align='center'}
+knitr::include_graphics("Proposal_images/Vannote1980_edit.png")
+```
+
+
+- change this to making predictions based on river characteristics
 - explain why investigating metabolism is important  
 - propose some study questions:
-    - can we see a "metabolic signature" of river characteristics (such as stream size, temperature, canopy cover, ) in this data?
-    - can we determine what controls the variation and magnitude of productivity within these rivers?
-
-
-
-We ask, can we see a "signature" of stream morphology in every metabolism profile?
-
-Larger rivers are less effected by canopy cover, as 
+- can we see a "metabolic signature" of river characteristics (such as stream size, temperature, canopy cover, ) in this data?
+- can we determine what controls the variation and magnitude of productivity within these rivers?  
 
 # Methods  
 - describe USGS data and how you collected it
@@ -57,7 +61,7 @@ Larger rivers are less effected by canopy cover, as
 - connect the results back to metabolism regime work done by bernhardt et al 2018, etc
 - describe plans for final project
 
-```{r data.import, cache = TRUE, echo = FALSE, warning = FALSE}
+```{r data.import, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
 # for this proposal, pull one USGS site
 # full project will do comparison between sites of different conditions: tropical rivers, artic rivers, heavy agricultural rivers, arid rivers
 
@@ -99,7 +103,7 @@ source("dataPrep.R")
 IA_MississippiR <- dataPrep(IA_MississippiR)
 ```
 
-```{r modeling, cache = TRUE, echo = FALSE, message = FALSE}
+```{r modeling, cache = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
 # notes for Tests.rmd
 #     verify input is in correct format:
 #       - verify column names are as expected (check that data has passed through dataPrep)
@@ -107,7 +111,6 @@ IA_MississippiR <- dataPrep(IA_MississippiR)
 source("metabolismModeling.R")
 metabModel.IA_MississippiR <- metabolismModeling(IA_MississippiR,
                                                  "IA_MississippiR_MetabolismModel.csv")
-str(metabModel.IA_MississippiR)
 ```
 
 ```{r plotting, fig.height=4, fig.width = 8, echo = FALSE, warning = FALSE}

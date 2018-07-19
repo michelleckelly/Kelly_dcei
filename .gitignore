@@ -18,3 +18,6 @@
 *.utf9.md
 *.knit.md
 
+# Ignore PDF file of my redrawn manuscript figures
+/UnitTestingHW/Proposal_images/Vannote1980_Redraw.pptx
+
