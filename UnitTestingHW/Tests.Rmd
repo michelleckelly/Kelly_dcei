@@ -1,45 +1,119 @@
 ---
 title: "Tests"
 author: "Michelle Kelly"
-date: "July 16, 2018"
-output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  pdf_document
 ---
 
 ```{r dataLoad_source}
 source("dataLoad.R")
 ```
 
-```{r dataLoad_input_test_1}
-# if local file does not exist, but start/end date is not specified, script returns error
-#
-# Pseudocode:
-#
-# if (local file exists){
-#   delete or rename local file so script doesnt recognize it
-# }
-#
-# output <- dataLoad()
-#
+```{r dataLoad_test_1}
+# verify that the csv exists in the directory before trying to load
+#     have yet to build this in as a loop in the function itself
+
+# filepath <- "./pathTo/FileThat/Doesn'tExist.csv"
+
+# output_dataLoad <- dataLoad(filepath)
+
 # if (warning returned by function){
 #   print("passed")
 # } else {
 #   print("failed")
 # }
+
+# should print failed in this instance
 ```
 
-```{r dataLoad_input_test_2}
+```{r dataLoad_test_2}
+# verify that column names of raw data are as expected
+#     have yet to build this in as a loop in the function itself
 
-```
+# create a dummy .csv that has an incorrect column name
+# filepath <- "./pathTo/Dummy.csv"
 
-```{r dataLoad_output_test_1}
-# test if the output of dataLoading has the correct classes
-#
-# run dataLoad function, its fine if local file exists
-#
-# check classes using lapply(dataframe, class)
-# if (classes are what you expect){
+# output_dataLoad <- dataLoad(filepath)
+
+# if (warning returned by function){
 #   print("passed")
 # } else {
 #   print("failed")
 # }
+
+# should print failed in this instance
+```
+
+```{r dataPrep_source}
+source("dataPrep.R")
+```
+
+```{r dataPrep_test_1}
+# check that all column classes are correct before executing function (particularly dateTime)
+
+# output_dataLoad$dateTime <- as.character(output_dataLoad$dateTime)
+
+# output_dataPrep <- dataPrep(output_dataLoad)
+
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+
+# should print failed in this instance
+```
+
+```{r dataPrep_test_2}
+# check that columns have the correct names, because function references these names internally
+
+# names(output_dataLoad)[names(output_dataLoad == "WaterTemp_C"] <- "wrongName"
+
+# output_dataPrep <- dataPrep(output_dataLoad)
+
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+
+# should print failed in this instance
+```
+
+```{r metabolismModeling_source}
+source("metabolismModeling.R")
+```
+
+```{r metabolismModeling_test_1}
+# return warning if na present in any row of input dataframe, this will break model
+
+# introduce an NA into the data frame. everything else about the data frame should be fine
+# output_dataPrep$DO.obs[1] <- NA
+
+# output_metabolismModeling <- dataPrep(output_dataPrep)
+
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+
+# should print failed in this instance
+```
+
+```{r metabolismModeling_test_2}
+# return warning if the necessary data ("solar.time", "DO.obs", "DO.sat", "depth", "temp.water", "light") is not present within the input dataframe 
+
+# names(output_dataPrep)[names(output_dataPrep == "DO.obs"] <- "wrongName"
+
+# output_metabolismModeling <- dataPrep(output_dataPrep)
+
+# if (warning returned by function){
+#   print("passed")
+# } else {
+#   print("failed")
+# }
+
+# should print failed in this instance
 ```

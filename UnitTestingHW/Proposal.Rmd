@@ -1,7 +1,7 @@
 ---
 title: "Data Carpentry: Final Project Proposal"
 author: "Michelle Kelly"
-date: "July 20, 2018"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   rmarkdown::pdf_document:
     fig_caption: true
@@ -37,13 +37,13 @@ However, primary production in rivers and streams doesn't often correlate with t
 knitr::include_graphics("input_png_bib_tex/Bernhardt2018.png")
 ```
 
-As stream size increases, ecosystem productivity is less effected by reach morphology, and more closely follows the terrestrial growing system. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].
+As stream size increases, annual ecosystem productivity is less effected by reach morphology, and is more strongly correlated with the terrestrial growing season. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].
 
 ```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al. 1980). \\label{vannote}", out.height="30%", fig.align='center'}
 knitr::include_graphics("input_png_bib_tex/Vannote1980_edit.png")
 ```
 
-Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic regimes", suggesting dominant annual patterns of GPP and ER dynamics for river ecosystems subjected to varying physical and biochemical conditions [-@Bernhardt2018]. We propose to "ground-truth" the metabolism regime concept by asking (1) can we see these propsed regimes in real stream data, and (2) can use a metabolism profile to "diagnose" local stream conditions, such as annual precipitation patterns, stream size, or surrounding land use?  
+Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic regimes", suggesting dominant annual patterns of GPP and ER dynamics for river ecosystems subjected to similar physical and biochemical conditions [-@Bernhardt2018]. We propose to "ground-truth" the metabolism regime concept by asking (1) do we see these proposed regimes in real stream data, and (2) can use an annual metabolic profile to "diagnose" local stream conditions, such as annual precipitation patterns, stream size, or surrounding land use?  
 
 # Methods
 
@@ -61,7 +61,7 @@ Missing data points were filled via interpolation, using `na.seasplit` function 
 
 We used the `streamMetabolizer` R package to fit a Markov chain Monte Carlo (MCMC) model to the data, using 500 samples for a warmup and 500 samples to fit the model (1000 total samples) [@streamMetabolizer]. For this preliminary report, the metabolism model was fit to the Mississippi River site only. Standard methods for the direct calculation of GPP, ER, and NEP [see @Odum1956] can't allow for changing air-water gas exchange dynamics with changing discharge, which introduces considerable error into multi-day metabolism estimates [@Appling2018].
 
-# Results
+# Results and discussion
 
 Values of GPP and ER both temporally varied, but GPP estimates were most dependent upon season. It is likely that GPP may be correlated with T, PAR, and Q, but this analysis has not yet been completed. In the Mississippi, GPP was lowest during colder months (January-March and October-November), and with the exception of a decrease in GPP in early July, closely follows the terrestrial growing season. Confidence intervals on ER estimates were much wider than those on GPP estimates, especially during colder months [Figure \ref{metab_plot}]. A similar analysis of the lower Mississippi River (Baton Rouge, LA) shows a negative correlation between PAR and GPP, and suggests that PAR may be indirectly related to disturbance effects, as maximum PAR and highest Q co-occured during late summer [@Dodds2013].
 
@@ -117,16 +117,14 @@ metabModel.IA_MississippiR <- metabolismModeling(IA_MississippiR,
                                                  "IA_MississippiR_MetabolismModel.csv")
 ```
 
-```{r plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Mississippi River, January 2017 - November 2017. \\label{metab_plot}"}
-# have a very short function that plots
+```{r plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Mississippi River, 2017. \\label{metab_plot}"}
 source("metabolismPlot.R")
-metabolismPlot(metabModel.IA_MississippiR, filename = "IA_MississippiR_MetabolismModel.png") # model is not totally complete, visually check over input data to improve model output. I think this example is fine for the purposes of the proposal, however.
+metabolismPlot(metabModel.IA_MississippiR, 
+               filename = "IA_MississippiR_MetabolismModel.png")
 ``` 
 
 For the final report, we will compare and contrast the metabolism profiles of these three sites, and identify possible predictors for a resultant "regime types". We will also evaluate how ecosystem NEP varies throughout the year.  
 
-# Discussion
-
-:^)
+Modeling metabolism for a full year and across different rivers will allow us to explore the effects of both seasonal (T, PAR, Q) and environmental (land use, climate) constraints on ecosystem productivity. In the past, metabolism modeling over long time series was rare, due to the energy required to collect and process data. Now, with the advent of cheap in-situ sensors and modeling packages, these analyses are becoming more common. Greater data availability will allow us to have a better understanding of what drives the ecological differences between stream systems. Ultimately, this may allow us to improve our estimates of carbon retention and loss from these systems, and determine the drivers behind both processes.  
 
 # References  

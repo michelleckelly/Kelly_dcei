@@ -1,7 +1,8 @@
 # preps data for metabolism modeling. Interpolates missing data points according to method of choice, estimates PAR from longitude and time data, estimates stream depth from discharge, converts DO saturation in percent to DO saturation in mg/L
 #
 # Arguments
-# data        dataframe, piped from dataLoad function, contains site information and stream data
+# data        dataframe, piped from dataLoad function, contains site information and 
+#             stream data
 # na.fill     character vector, algorithm that will be used by imputeTS::na.seasplit 
 #             to fill gaps in the time series data. see documentation of na.seasplit() 
 #             for a list of options. Defaults to interpolation

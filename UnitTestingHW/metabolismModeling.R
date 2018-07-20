@@ -1,18 +1,31 @@
 # script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data.
 #
 # Arguments
-# metab.data       dataframe of stream metabolism time series parameters, 
+# metab.data      dataframe of stream metabolism time series parameters, 
 #                 assembled by dataLoad.R and reformatted by dataPrep.R
-# filename
-# pool_K600
-# err_obs_iid
-# err_proc_acor
-# err_proc_iid
-# ode_method
-# deficit_src
+# filename        character vector. input of what local .csv of model output should be named
+# pool_K600       character vector, how should model pool information across multiple days to 
+#                 estimate K600? See streamMetabolizer::mm_name() for more info. Default is 
+#                 "binned"
+# err_obs_iid     logical. should IID observation error in DO data be included in the model? 
+#                 Defaults to TRUE, which is the streamPULSE reccommendation. See 
+#                 streamMetabolizer::mm_name() for more info.
+# err_proc_acor   logical. should autocorrelated process error be included? 
+#                 Defaults to FALSE, which is the streamPULSE reccommendation. See 
+#                 streamMetabolizer::mm_name() for more info.
+# err_proc_iid    logical. should IID process error in DO data be included in the model? 
+#                 Defaults to TRUE, which is the streamPULSE reccommendation. See 
+#                 streamMetabolizer::mm_name() for more info.
+# ode_method      character. method for solving the differential equation for DO. See 
+#                 streamMetabolizer::mm_name() for full list of options, defaults to 
+#                 "trapezoid"
+# deficit_src     character vector. should the DO estimate be computed from the observed or
+#                 modeled DO data? defaults to "DO_mod", which is the streamPULSE 
+#                 reccomendation. See streamMetabolizer::mm_name() for full options. 
 #
 # Outputs
-#
+#                 returns .csv of model predictions to local file, outputs dataframe of 
+#                 predictions to environment
 #
 # Dependencies
 # library(streamMetabolizer)
@@ -47,7 +60,7 @@ metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
   predictions <- streamMetabolizer::predict_metab(modelfit)
   # return model results and save results locally
   output <- list(predictions = predictions, fit = modelfit)
-  write.csv(output$predictions, file = paste0("./output_model/", filename, ".csv"),
+  write.csv(output$predictions, file = paste0("./output_model/", filename),
             row.names = FALSE)
   #
   return(output$predictions)
