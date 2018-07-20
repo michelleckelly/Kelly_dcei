@@ -25,9 +25,9 @@ metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
   # check if all model variables are actually in the dataframe or not, return error if false
   #
   # check if .Rdata file of model results already exists, if it does, ask user if they want to load file from memory instead of running model
-  if(file.exists(paste0("./model_output/", filename))){
+  if(file.exists(paste0("./output_model/", filename))){
     #menu(c("Yes", "No"), title = "Load model results from file? If no, function will re-run metabolism model instead.")
-    output <- read.csv(paste0("./model_output/", filename), header = TRUE)
+    output <- read.csv(paste0("./output_model/", filename), header = TRUE)
     return(output)
     break
   }
@@ -47,7 +47,7 @@ metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
   predictions <- streamMetabolizer::predict_metab(modelfit)
   # return model results and save results locally
   output <- list(predictions = predictions, fit = modelfit)
-  write.csv(output$predictions, file = paste0("./model_output/", filename, ".csv"),
+  write.csv(output$predictions, file = paste0("./output_model/", filename, ".csv"),
             row.names = FALSE)
   #
   return(output$predictions)

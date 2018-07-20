@@ -44,7 +44,7 @@ dataPrep <- function(data, na.fill = "interpolation"){
                                                          latitude = data$Lat[1],
                                                          format = "degrees")
   # let user know that PAR was estimated based on latitude and time
-  cat("PAR estimated based on latitude and time.\n")
+  message("PAR estimated based on latitude and time.\n")
   #
   # estimate depth (m) from discharge data
   data$depth <- streamMetabolizer::calc_depth(data$Discharge_m3s)

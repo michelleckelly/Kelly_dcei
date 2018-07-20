@@ -24,7 +24,7 @@ metabolismPlot <- function(metab_output, filename){
     scale_color_discrete(name = NULL) + 
     scale_fill_discrete(name = "95% CI", labels = NULL) + 
     theme_classic() + theme(legend.position = "top")
-  ggsave(filename = paste0("./model_output/", filename), plot = plot, width = 8, 
+  ggsave(filename = paste0("./output_model/", filename), plot = plot, width = 8, 
          height = 3, units = "in")
   return(plot)
 }
