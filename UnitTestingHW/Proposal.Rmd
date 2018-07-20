@@ -1,0 +1,132 @@
+---
+title: "Data Carpentry: Final Project Proposal"
+author: "Michelle Kelly"
+date: "July 20, 2018"
+output: 
+  rmarkdown::pdf_document:
+    fig_caption: true
+    includes:
+      in_header: input_png_bib_tex/latex-environment.tex
+bibliography: input_png_bib_tex/proposal_citations.bib
+---
+
+```{r setup, echo = FALSE, warning = FALSE, message = FALSE}
+# streamPULSE pipeline tools
+#library(devtools)
+#install_github('streampulse/StreamPULSE', dependencies=TRUE)
+
+# Latest version of streamMetabolizer
+#install.packages("streamMetabolizer", dependencies = TRUE, 
+#                 repos = c("https://owi.usgs.gov/R", "https://cran.rstudio.com"))
+
+library(lubridate)
+library(streamMetabolizer)
+library(imputeTS)
+library(ggplot2)
+```
+
+# Introduction
+
+The conversion of solar energy, water, and carbon dioxide into metabolizable carbon products forms the foundation of the trophic ladder: supporting both producers and consumers. The conversion rate of solar energy to organic energy within an ecosystem is termed gross primary productivity (GPP), and can be measured as oxygen produced per day. The consumption of this organic energy, by both autotrophs and heterotrophs, is termed ecosystem respiration (ER). The balance between GPP and ER is referred to as net ecosystem production (NEP), and can ultimately be used as an indicator of whether an ecosystem is retaining or losing carbon [@Odum1956; @Woodwell1968].  
+
+In terrestrial systems, NEP often follows a predictable annual cycle. GPP and NEP tend to peak during warm, wet summer months, when conditions are most favorable for photosynthetic growth. Primary production in lakes usually syncs up with the terrestrial cycle; greater light availability, higher water temperatures, and available dissolved nutrients create the ideal cocktail for algae, moss, and macrophyte growth [@Woodwell1968].  
+
+However, primary production in rivers and streams doesn't often correlate with the terrestrial growing season. In small streams, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Variations in stream flow, which can be caused by rain events, snow melt, or drought, scour or desiccate stream beds, reducing the biomass of primary producers. Stream hydrology can follow a yearly pattern, but vary widely between biomes [Figure \ref{bernhardt}]. Furthermore, reaches may also receive a significant carbon input from non-aquatic sources, such as an influx of leaf litter during Autumn, or the flushing of soil-bound organic matter during rain events [@Vannote1980]. Carbon input from terrestrial sources can equal or exceed yearly GPP, blurring the seasonal pattern of GPP and ER [@Bernhardt2018].
+
+```{r bernhardt, echo = FALSE, fig.cap="Conceptual yearly hydrographs for rivers experiencing aseasonal rain dynamics, a mid-year monsoon season, and a spring snowmelt (adapted from Bernhardt et al. 2018). \\label{bernhardt}", out.height="20%", fig.align = "center"}
+knitr::include_graphics("input_png_bib_tex/Bernhardt2018.png")
+```
+
+As stream size increases, ecosystem productivity is less effected by reach morphology, and more closely follows the terrestrial growing system. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].
+
+```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al. 1980). \\label{vannote}", out.height="30%", fig.align='center'}
+knitr::include_graphics("input_png_bib_tex/Vannote1980_edit.png")
+```
+
+Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic regimes", suggesting dominant annual patterns of GPP and ER dynamics for river ecosystems subjected to varying physical and biochemical conditions [-@Bernhardt2018]. We propose to "ground-truth" the metabolism regime concept by asking (1) can we see these propsed regimes in real stream data, and (2) can use a metabolism profile to "diagnose" local stream conditions, such as annual precipitation patterns, stream size, or surrounding land use?  
+
+# Methods
+
+## Site details and raw data
+
+We selected the Mississippi River (Clinton, IA), the North Branch of the Park River (Hartford, CT), and the Sacramento River (near Sacramento, CA), for this analysis. These sites are located at similar latitudes to account for overall differences in light intensity, but have differences in river size, land use, and climate regime. Data was provided by the United States Geological Survey (USGS) National Water Information System database (waterdata.usgs.gov/nwis), and spanned from January 1, 2017 to November 1, 2017. Stream discharge, water temperature, and dissolved oxygen were measured at 15 minute intervals from January 1, 2017 to December 31, 2017 at the Sacramento and Park River sites, and thru November 1, 2017 at the Mississippi River site due to ice cover.  
+
+<!-- A note for final project: inserting a table here of stream attributes such as dominant land use, precipitation regime, river discharge, relative size would be a good idea -->
+
+Photosynthetically active radiation (PAR) was estimated using time and latitude. A more common (and accurate) approach would be to use PAR data collected at a local solar irradiance monitoring station, or collected by a portable in-field sensor. For the purposes of this preliminary proposal, we chose an estimation technique for a quick proof of concept. Depth data was back-calculated from instantaneous discharge measurements using $\ d=cQ^f$, where depth (d) is equal to the theoretical coefficient of depth at unit discharge (c, 0.409 m) multiplied by discharge (Q, m^3^ s^-1^) to the power of the theoretical exponent of depth at unit discharge (f, 0.294) [see @Leopold1953; @Raymond2012].  
+
+Missing data points were filled via interpolation, using `na.seasplit` function from the `imputeTS` R package [@imputeTS; @R]. This function seasonally decomposes time series data, and performs imputation seperately for each resulting seasonal chunk. This interpolation method is the same as that used by the `streamPULSE` team, a national stream metabolism research group [@StreamPULSE].
+
+## Metabolism modeling
+
+We used the `streamMetabolizer` R package to fit a Markov chain Monte Carlo (MCMC) model to the data, using 500 samples for a warmup and 500 samples to fit the model (1000 total samples) [@streamMetabolizer]. For this preliminary report, the metabolism model was fit to the Mississippi River site only. Standard methods for the direct calculation of GPP, ER, and NEP [see @Odum1956] can't allow for changing air-water gas exchange dynamics with changing discharge, which introduces considerable error into multi-day metabolism estimates [@Appling2018].
+
+# Results
+
+Values of GPP and ER both temporally varied, but GPP estimates were most dependent upon season. It is likely that GPP may be correlated with T, PAR, and Q, but this analysis has not yet been completed. In the Mississippi, GPP was lowest during colder months (January-March and October-November), and with the exception of a decrease in GPP in early July, closely follows the terrestrial growing season. Confidence intervals on ER estimates were much wider than those on GPP estimates, especially during colder months [Figure \ref{metab_plot}]. A similar analysis of the lower Mississippi River (Baton Rouge, LA) shows a negative correlation between PAR and GPP, and suggests that PAR may be indirectly related to disturbance effects, as maximum PAR and highest Q co-occured during late summer [@Dodds2013].
+
+```{r data.import, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+# for this proposal, pull one USGS site
+# full project will do comparison between sites of different conditions: tropical rivers, artic rivers, heavy agricultural rivers, arid rivers
+
+source("dataLoad.R")
+
+# notes for Tests.Rmd
+#     verify input is in correct format:
+#         - verify column names are as expected
+
+# large, aseasonal, little canopy cover: loading CA sacramento data
+filepath_CA <- "./input_data/CA_SacramentoR.csv"
+lat_CA <- "38.257778"
+long_CA <- "-121.517222"
+tz_CA <- "America/Los_Angeles"
+CA_SacramentoR <- dataLoad(filepath = filepath_CA, lat = lat_CA, long = long_CA, tz = tz_CA)
+
+# small, seasonal, and forested: loading CT data
+filepath_CT <- "./input_data/CT_NorthBranchParkR.csv"
+lat_CT <- "41.784439"
+long_CT <- "-72.708056"
+tz_CT <- "America/New_York"
+CT_NorthBranch <- dataLoad(filepath = filepath_CT, lat = lat_CT, long = long_CT, tz = tz_CT)
+
+# large, seasonal, agriculturally dominated: Mississippi R at Clinton IA
+# gage # 05420500
+filepath_IA <- "./input_data/IA_MississippiR.csv"
+lat_IA <- "41.780556"
+long_IA <- "-90.251944"
+tz_IA <- "America/Chicago"
+IA_MississippiR <- dataLoad(filepath = filepath_IA, lat = lat_IA, long = long_IA, tz = tz_IA)
+```
+
+```{r dataPrep, echo = FALSE, warning = FALSE, message = FALSE}
+# notes for Tests.Rmd
+#     verify input is in correct format:
+#         - verify column names are as expected
+#         - verify column classes are as expected
+source("dataPrep.R")
+IA_MississippiR <- dataPrep(IA_MississippiR)
+```
+
+```{r modeling, cache = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+# notes for Tests.rmd
+#     verify input is in correct format:
+#       - verify column names are as expected (check that data has passed through dataPrep)
+#       - verify no NA values in any columns
+source("metabolismModeling.R")
+metabModel.IA_MississippiR <- metabolismModeling(IA_MississippiR,
+                                                 "IA_MississippiR_MetabolismModel.csv")
+```
+
+```{r plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Mississippi River, January 2017 - November 2017. \\label{metab_plot}"}
+# have a very short function that plots
+source("metabolismPlot.R")
+metabolismPlot(metabModel.IA_MississippiR, filename = "IA_MississippiR_MetabolismModel.png") # model is not totally complete, visually check over input data to improve model output. I think this example is fine for the purposes of the proposal, however.
+``` 
+
+For the final report, we will compare and contrast the metabolism profiles of these three sites, and identify possible predictors for a resultant "regime types". We will also evaluate how ecosystem NEP varies throughout the year.  
+
+# Discussion
+
+:^)
+
+# References  
