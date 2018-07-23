@@ -16,10 +16,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(metabolizerhelper)
-```
-
 ## Importing data
 
 ```{r dataLoad}
