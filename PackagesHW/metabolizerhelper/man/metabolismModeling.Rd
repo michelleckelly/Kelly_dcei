@@ -31,3 +31,9 @@ returns .csv of model predictions to local file, outputs dataframe of prediction
 \description{
 script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data. will take considerable time to run.
 }
+\examples{
+data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+data <- dataPrep(data, na.fill = "interpolation")
+model_data <- metabolismModeling(data, filename = "metabolismmodel_results.csv")
+
+}

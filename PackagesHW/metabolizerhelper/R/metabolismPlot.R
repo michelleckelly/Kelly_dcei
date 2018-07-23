@@ -6,7 +6,12 @@
 #'
 #' @return returns plot of metabolism data, as described in function overview
 #'
-
+#' @examples
+#' data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+#' data <- dataPrep(data, na.fill = "interpolation")
+#' model_data <- metabolismModeling(data, filename = "metabolismmodel_results.csv")
+#' metabolismPlot(model_data, filename = "metabolismplot.png")
+#'
 metabolismPlot <- function(metab_output, filename){
   # if filename exists, load plot from file and display to user (with message that plot is loaded from file)
   metab_output$date <- ymd(metab_output$date)

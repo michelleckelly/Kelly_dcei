@@ -13,7 +13,11 @@
 #'
 #' @return returns .csv of model predictions to local file, outputs dataframe of predictions to environment
 #'
-
+#' @examples
+#' data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+#' data <- dataPrep(data, na.fill = "interpolation")
+#' model_data <- metabolismModeling(data, filename = "metabolismmodel_results.csv")
+#'
 metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
                                err_obs_iid = TRUE,
                                err_proc_acor = FALSE, err_proc_iid = TRUE,

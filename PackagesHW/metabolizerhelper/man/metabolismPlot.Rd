@@ -17,3 +17,10 @@ returns plot of metabolism data, as described in function overview
 \description{
 returns a formatted plot of metabolism modeling results, including confidence bands on model estimates.
 }
+\examples{
+data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+data <- dataPrep(data, na.fill = "interpolation")
+model_data <- metabolismModeling(data, filename = "metabolismmodel_results.csv")
+metabolismPlot(model_data, filename = "metabolismplot.png")
+
+}
