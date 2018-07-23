@@ -18,3 +18,4 @@ Description: This package is designed to format a limited dataset of stream disc
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.0.1

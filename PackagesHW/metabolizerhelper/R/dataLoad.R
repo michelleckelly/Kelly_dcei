@@ -1,29 +1,20 @@
-# load local datafile, transform local time to UTC time, convert from American to SI units, and then return data to user
-# 
-# Arguments
-# filepath         character vector, file path to river data
-# lat              character vector, decimal latitude of site location
-# long             character vector, decimal longitude of site location
-# tz               character vector of the time zone, as recognized by OlsonNames()
-# 
-# Output
-# data             dataframe of stream data (discharge, water temperature, dissolved oxygen, 
-#                  photosynthetically active radiation) from USGS sensor site
-#
-# Dependencies
-# library(lubridate)
-#
-# note: 
-#       add check that if local file does not exist and start/end.date is not 
-#         specified, return error message asking for date specification
-#         can also add this check to Tests.Rmd
+#' load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user
+#'
+#' @param filepath character vector, file path to data file, including file name and extension
+#' @param lat character vector, decimal latitude of site location
+#' @param long character vector, decimal longitude of site location
+#' @param tz character vector of the time zone, as recognized by OlsonNames
+#'
+#' @return dataframe of date-time in UTC, discharge in m^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation, site latitude and longitude
+#' @examples
+#' dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
 
 dataLoad <- function(filepath, lat, long, tz){
   # check if filepath is valid
   if (!file.exists(filepath)){
-    stop(paste("Data file can't be found. Check that filepath is specified correctly."), 
+    stop(paste("Data file can't be found. Check that filepath is specified correctly."),
          call. = FALSE)
-  } 
+  }
   #
   # load data
   data <- read.csv(filepath, header = TRUE)
@@ -35,7 +26,7 @@ dataLoad <- function(filepath, lat, long, tz){
     stop(paste("Check that column names are correct. Data file must contain columns labeled:",
                "\n\t'site_no', 'dateTime', 'tz_cd', 'Discharge_ft3s', 'WaterTemp_C'",
                "\n\t'DO_mgL', 'DOsat_pct'"), call. = FALSE)
-  } 
+  }
   # add columns of site latitude and longitude
   data$Lat <- as.numeric(lat)
   data$Long <- as.numeric(long)
@@ -53,7 +44,7 @@ dataLoad <- function(filepath, lat, long, tz){
   data$Discharge_m3s <- ft3s_m3s(data$Discharge_ft3s)
   #
   # drop unnecessary columns
-  data <- data[, c("Lat", "Long", "dateTime", "WaterTemp_C", "Discharge_m3s", 
+  data <- data[, c("Lat", "Long", "dateTime", "WaterTemp_C", "Discharge_m3s",
                    "DO_mgL", "DOsat_pct")]
   #
   # return dataframe and exit function
