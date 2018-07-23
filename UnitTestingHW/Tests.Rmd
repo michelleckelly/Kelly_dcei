@@ -1,5 +1,5 @@
 ---
-title: "Tests"
+title: "Data Carpentry: Proposal Tests"
 author: "Michelle Kelly"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -10,110 +10,116 @@ output:
 source("dataLoad.R")
 ```
 
-```{r dataLoad_test_1}
+```{r dataLoad_test_1, error=TRUE}
 # verify that an error is returned if data file does not exist in directory
-#
+
 # specify non-existant file path
 filepath <- "./input_data/FileThatDoesn'tExist.csv"
 
-# display output of script to user, should return error message
+# display output of script to user, should return detailed error message
 output_dataLoad <- dataLoad(filepath)
 
 # test is passed if script returns error
-if (tryCatch(input, error = function(c) "Error") == "Error"){
+if (tryCatch(dataLoad(filepath), error = function(c) "Error") == "Error"){
   print("Passed")
 } else {
   print("Failed")
 }
 ```
 
-```{r dataLoad_test_2}
+```{r dataLoad_test_2, error=TRUE}
 # verify that column names of raw data are as expected
-#     have yet to build this in as a loop in the function itself
 
-# create a dummy .csv that has an incorrect column name
-# filepath <- "./pathTo/Dummy.csv"
+# create dummy data with an incorrect column name
+dummyData <- data.frame(incorrect_colname = 10, dateTime = "1/1/2017 0:00", tz_cd = "PST",
+                        Discharge_ft3s = 10, WaterTemp_C = 10, DO_mgL = 10, DOsat_pct = 100)
+write.csv(dummyData, file = "./input_data/Tests_DummyData.csv", row.names = FALSE)
 
-# output_dataLoad <- dataLoad(filepath)
+# specify correct file path
+filepath <- "./input_data/Tests_DummyData.csv"
 
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
+# display output of script to user, should return detailed error message
+output_dataLoad <- dataLoad(filepath)
 
-# should print failed in this instance
+# test is passed if script returns error
+if (tryCatch(dataLoad(filepath), error = function(c) "Error") == "Error"){
+  print("Passed")
+} else {
+  print("Failed")
+}
 ```
 
 ```{r dataPrep_source}
+# load dummyData (with correct column names)
+dummyData <- data.frame(site_no = 10, dateTime = "1/1/2017 0:00", tz_cd = "PST",
+                        Discharge_ft3s = 10, WaterTemp_C = 10, DO_mgL = 10, DOsat_pct = 100)
+write.csv(dummyData, file = "./input_data/Tests_DummyData.csv", row.names = FALSE)
+# process dummyData through dataLoad
+output_dataLoad <- dataLoad(filepath, lat = 50, long = 100, tz = "UTC")
+
 source("dataPrep.R")
 ```
 
-```{r dataPrep_test_1}
-# check that all column classes are correct before executing function (particularly dateTime)
+```{r dataPrep_test_1, error=TRUE}
+# check that class of dateTime is POSIXct
 
-# output_dataLoad$dateTime <- as.character(output_dataLoad$dateTime)
+# change class of dateTime entry from POSIXct to character
+output_dataLoad$dateTime <- as.character(output_dataLoad$dateTime)
 
-# output_dataPrep <- dataPrep(output_dataLoad)
+# display output of script to user, should return detailed error message
+output_dataPrep <- dataPrep(output_dataLoad)
 
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
-
-# should print failed in this instance
+# test is passed if script returns error
+if (tryCatch(dataPrep(output_dataLoad), error = function(c) "Error") == "Error"){
+  print("Passed")
+} else {
+  print("Failed")
+}
 ```
 
-```{r dataPrep_test_2}
+```{r dataPrep_test_2, error=TRUE}
 # check that columns have the correct names, because function references these names internally
 
-# names(output_dataLoad)[names(output_dataLoad == "WaterTemp_C"] <- "wrongName"
+# change class of output_dataLoad$dateTime back to POSIXct
+output_dataLoad$dateTime <- lubridate::ymd_hm(paste(output_dataLoad$dateTime, "00:00"))
 
-# output_dataPrep <- dataPrep(output_dataLoad)
+# change name of "WaterTemp_C" column
+names(output_dataLoad)[names(output_dataLoad) == "WaterTemp_C"] <- "wrongName"
 
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
+# display output of script to user, should return detailed error message
+output_dataPrep <- dataPrep(output_dataLoad)
 
-# should print failed in this instance
+# test is passed if script returns error
+if (tryCatch(dataPrep(output_dataLoad), error = function(c) "Error") == "Error"){
+  print("Passed")
+} else {
+  print("Failed")
+}
 ```
 
-```{r metabolismModeling_source}
+```{r metabolismModeling_source, warning=FALSE}
+# process dummyData through dataLoad and dataPrep
+output_dataLoad <- dataLoad(filepath, lat = 50, long = 100, tz = "UTC")
+output_dataPrep <- dataPrep(output_dataLoad)
+
 source("metabolismModeling.R")
 ```
 
-```{r metabolismModeling_test_1}
+```{r metabolismModeling_test_1, error=TRUE}
 # return warning if na present in any row of input dataframe, this will break model
+# this will catch if the data was pre-processed with dataPrep, so a secondary check of 
+# correct column names is unnecessary.
 
-# introduce an NA into the data frame. everything else about the data frame should be fine
-# output_dataPrep$DO.obs[1] <- NA
+# introduce NA into DO.obs column
+output_dataPrep$DO.obs[1] <- NA
 
-# output_metabolismModeling <- dataPrep(output_dataPrep)
+# display output of script to user, should return detailed error message
+output_metabolismModeling <- metabolismModeling(output_dataPrep)
 
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
-
-# should print failed in this instance
-```
-
-```{r metabolismModeling_test_2}
-# return warning if the necessary data ("solar.time", "DO.obs", "DO.sat", "depth", "temp.water", "light") is not present within the input dataframe 
-
-# names(output_dataPrep)[names(output_dataPrep == "DO.obs"] <- "wrongName"
-
-# output_metabolismModeling <- dataPrep(output_dataPrep)
-
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
-
-# should print failed in this instance
+# test is passed if script returns error
+if (tryCatch(metabolismModeling(output_dataPrep), error = function(c) "Error") == "Error"){
+  print("Passed")
+} else {
+  print("Failed")
+}
 ```

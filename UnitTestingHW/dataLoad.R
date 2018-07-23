@@ -41,8 +41,8 @@ dataLoad <- function(filepath, lat, long, tz){
   data$Long <- as.numeric(long)
   #
   # convert dateTime from local timezone to UTC
-  data$dateTime_Local <- mdy_hm(data$dateTime, tz = tz)
-  data$dateTime_UTC <- with_tz(data$dateTime_Local, "UTC")
+  data$dateTime_Local <- lubridate::mdy_hm(data$dateTime, tz = tz)
+  data$dateTime_UTC <- lubridate::with_tz(data$dateTime_Local, "UTC")
   data$dateTime <- data$dateTime_UTC
   #
   # convert units from cubic foot per second to m3 per second

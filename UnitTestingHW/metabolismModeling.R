@@ -37,10 +37,16 @@ metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
   #
   # check if all model variables are actually in the dataframe or not, return error if false
   #
-  # check if .Rdata file of model results already exists, if it does, ask user if they want to load file from memory instead of running model
+  # check if metab.data contains any NA. 
+  if(anyNA(metab.data)){
+    stop(paste("Data contains NA values, which break streamMetabolizer. Process data with",
+               "\n\tdataPrep function first, then use metabolismModeling."), call. = FALSE)
+  }
+  # check if .csv of model results already exists
   if(file.exists(paste0("./output_model/", filename))){
-    #menu(c("Yes", "No"), title = "Load model results from file? If no, function will re-run metabolism model instead.")
+    # if file exists, load model results from file
     output <- read.csv(paste0("./output_model/", filename), header = TRUE)
+    message("Metabolism model results loaded from local file.")
     return(output)
     break
   }

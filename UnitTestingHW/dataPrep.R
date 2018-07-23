@@ -16,6 +16,20 @@
 # library(lubridate)
 
 dataPrep <- function(data, na.fill = "interpolation"){
+  # check that dateTime is class POSIXct
+  if (! lubridate::is.POSIXct(data$dateTime)){
+    stop(paste("'dateTime' must be in POSIXct format."), call. = FALSE)
+  }
+  #
+  # check that data contains correct column names
+  col_names <- list("Lat", "Long", "dateTime", "Discharge_m3s",
+                    "WaterTemp_C", "DO_mgL", "DOsat_pct")
+  if(any(! colnames(data) %in% col_names)){
+    stop(paste("Check that column names are correct. Data file must contain columns labeled:",
+               "\n\t'Lat', 'Long', dateTime', 'Discharge_m3s', 'WaterTemp_C'",
+               "\n\t'DO_mgL', 'DOsat_pct'"), call. = FALSE)
+  }
+  #
   # model will be broken by NA values, therefore
   # fill in NA gaps with imputeTS::na.seasplit according to algorithm of choice
   # note: find a way to silence these warnings after all bug fixes are done
