@@ -66,9 +66,6 @@ We used the `streamMetabolizer` R package to fit a Markov chain Monte Carlo (MCM
 Values of GPP and ER both temporally varied, but GPP estimates were most dependent upon season. It is likely that GPP may be correlated with T, PAR, and Q, but this analysis has not yet been completed. In the Mississippi, GPP was lowest during colder months (January-March and October-November), and with the exception of a decrease in GPP in early July, closely follows the terrestrial growing season. Confidence intervals on ER estimates were much wider than those on GPP estimates, especially during colder months [Figure \ref{metab_plot}]. A similar analysis of the lower Mississippi River (Baton Rouge, LA) shows a negative correlation between PAR and GPP, and suggests that PAR may be indirectly related to disturbance effects, as maximum PAR and highest Q co-occured during late summer [@Dodds2013].
 
 ```{r data.import, cache = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
-# for this proposal, pull one USGS site
-# full project will do comparison between sites of different conditions: tropical rivers, artic rivers, heavy agricultural rivers, arid rivers
-
 source("dataLoad.R")
 
 # notes for Tests.Rmd

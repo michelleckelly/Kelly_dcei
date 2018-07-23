@@ -11,20 +11,20 @@ source("dataLoad.R")
 ```
 
 ```{r dataLoad_test_1}
-# verify that the csv exists in the directory before trying to load
-#     have yet to build this in as a loop in the function itself
+# verify that an error is returned if data file does not exist in directory
+#
+# specify non-existant file path
+filepath <- "./input_data/FileThatDoesn'tExist.csv"
 
-# filepath <- "./pathTo/FileThat/Doesn'tExist.csv"
+# display output of script to user, should return error message
+output_dataLoad <- dataLoad(filepath)
 
-# output_dataLoad <- dataLoad(filepath)
-
-# if (warning returned by function){
-#   print("passed")
-# } else {
-#   print("failed")
-# }
-
-# should print failed in this instance
+# test is passed if script returns error
+if (tryCatch(input, error = function(c) "Error") == "Error"){
+  print("Passed")
+} else {
+  print("Failed")
+}
 ```
 
 ```{r dataLoad_test_2}
