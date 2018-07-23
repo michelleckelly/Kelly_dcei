@@ -1,6 +1,6 @@
-#' \code{dataLoad} format raw data and convert from American to SI units
+#' \code{dataLoad} format raw stream data
 #'
-#' load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user ready to pump into \code{\link{dataPrep}}
+#' load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user and ready to pump into \code{\link{dataPrep}}
 #'
 #' @param filepath character vector, file path to data file, including file name and extension
 #' @param lat character vector, decimal latitude of site location

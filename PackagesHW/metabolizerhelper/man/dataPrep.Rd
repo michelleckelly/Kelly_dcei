@@ -9,7 +9,7 @@ dataPrep(data, na.fill = "interpolation")
 \arguments{
 \item{data}{dataframe, piped from dataLoad function, contains site information and stream data}
 
-\item{na.fill}{character vector, algorithm that will be used by imputeTS::na.seasplit to fill gaps in the time series data. see documentation of na.seasplit() for a list of options. Defaults to interpolation}
+\item{na.fill}{character vector, algorithm that will be used by \code{\link[imputeTS]{na.seasplit}} to fill gaps in the time series data. See documentation of \code{\link[imputeTS]{na.seasplit}} for a list of options. Defaults to interpolation}
 }
 \value{
 dataframe, reformatted and ready to pipe into metabolismModeling.R

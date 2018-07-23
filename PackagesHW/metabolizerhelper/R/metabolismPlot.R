@@ -1,10 +1,11 @@
-#' \code{metabolismPlot} generate a pretty plot of GPP and ER estimates, with 95% confidence interval bands
+#' \code{metabolismPlot} generate a pretty plot of GPP and ER estimates
 #'
 #' returns a formatted plot of metabolism modeling results, including confidence bands on model estimates.
-#' @param metab_output the list object returned by metabolismModeling.R
+#'
+#' @param metab_output the list object returned by \code{metabolismModeling}
 #' @param filename character vector of filename for plot (including file extension)
 #'
-#' @return returns plot of metabolism data, as described in function overview
+#' @return returns plot of metabolism data and saves plot to local file using ggsave()
 #'
 #' @examples
 #' data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")

@@ -2,17 +2,17 @@
 % Please edit documentation in R/metabolismPlot.R
 \name{metabolismPlot}
 \alias{metabolismPlot}
-\title{\code{metabolismPlot} generate a pretty plot of GPP and ER estimates, with 95% confidence interval bands}
+\title{\code{metabolismPlot} generate a pretty plot of GPP and ER estimates}
 \usage{
 metabolismPlot(metab_output, filename)
 }
 \arguments{
-\item{metab_output}{the list object returned by metabolismModeling.R}
+\item{metab_output}{the list object returned by \code{metabolismModeling}}
 
 \item{filename}{character vector of filename for plot (including file extension)}
 }
 \value{
-returns plot of metabolism data, as described in function overview
+returns plot of metabolism data and saves plot to local file using ggsave()
 }
 \description{
 returns a formatted plot of metabolism modeling results, including confidence bands on model estimates.

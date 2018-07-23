@@ -1,15 +1,15 @@
 #' \code{metabolismModeling} model metabolism with streamMetabolizer package
 #'
-#' script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data. will take considerable time to run.
+#' estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data, using an MCMC model.
 #'
-#' @param metab.data dataframe of stream metabolism time series parameters, assembled by dataLoad.R and reformatted by dataPrep.R
+#' @param metab.data dataframe of stream metabolism time series parameters, assembled by \code{\link{dataLoad}} and reformatted by \code{\link{dataPrep}}
 #' @param filename character vector. input of what local .csv of model output should be named, including filepath if needed
-#' @param pool_K600 character vector, how should model pool information across multiple days to estimate K600? See streamMetabolizer::mm_name() for more info. Default is "binned"
-#' @param err_obs_iid logical. should IID observation error in DO data be included in the model? Defaults to TRUE, which is the streamPULSE reccommendation. See streamMetabolizer::mm_name() for more info.
-#' @param err_proc_acor logical. should autocorrelated process error be included? Defaults to FALSE, which is the streamPULSE reccommendation. See streamMetabolizer::mm_name() for more info.
-#' @param err_proc_iid logical. should IID process error in DO data be included in the model? Defaults to TRUE, which is the streamPULSE reccommendation. See streamMetabolizer::mm_name() for more info.
-#' @param ode_method character. method for solving the differential equation for DO. See streamMetabolizer::mm_name() for full list of options, defaults to "trapezoid"
-#' @param deficit_src character vector. should the DO estimate be computed from the observed or modeled DO data? defaults to "DO_mod", which is the streamPULSE reccomendation. See streamMetabolizer::mm_name() for full options.
+#' @param pool_K600 character vector, how should model pool information across multiple days to estimate K600? See \code{\link[streamMetabolizer]{mm_name}} for more info. Default is "binned"
+#' @param err_obs_iid logical. should IID observation error in DO data be included in the model? Defaults to TRUE, which is the streamPULSE reccommendation. See \code{\link[streamMetabolizer]{mm_name}} for more info.
+#' @param err_proc_acor logical. should autocorrelated process error be included? Defaults to FALSE, which is the streamPULSE reccommendation. See \code{\link[streamMetabolizer]{mm_name}} for more info.
+#' @param err_proc_iid logical. should IID process error in DO data be included in the model? Defaults to TRUE, which is the streamPULSE reccommendation. See \code{\link[streamMetabolizer]{mm_name}} for more info.
+#' @param ode_method character. method for solving the differential equation for DO. See \code{\link[streamMetabolizer]{mm_name}} for full list of options, defaults to "trapezoid"
+#' @param deficit_src character vector. should the DO estimate be computed from the observed or modeled DO data? defaults to "DO_mod", which is the streamPULSE reccomendation. See \code{\link[streamMetabolizer]{mm_name}} for full options.
 #'
 #' @return returns .csv of model predictions to local file, outputs dataframe of predictions to environment
 #'
