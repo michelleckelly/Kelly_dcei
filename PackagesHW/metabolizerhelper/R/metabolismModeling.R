@@ -1,6 +1,6 @@
 #' \code{metabolismModeling} model metabolism with streamMetabolizer package
 #'
-#' script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data.
+#' script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data. will take considerable time to run.
 #'
 #' @param metab.data dataframe of stream metabolism time series parameters, assembled by dataLoad.R and reformatted by dataPrep.R
 #' @param filename character vector. input of what local .csv of model output should be named, including filepath if needed

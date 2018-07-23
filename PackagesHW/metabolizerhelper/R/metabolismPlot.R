@@ -1,14 +1,11 @@
-# returns a formatted plot of metabolism modeling results, including confidence bands on model estimates.
-#
-# Arguments
-# metab_output      the list object returned by metabolismModeling.R
-# filename          character vector of filename for plot (including file extension)
-#
-# Output
-#                   returns plot of metabolism data, as described in function overview
-#
-# Dependencies
-# library(ggplot2)
+#' \code{metabolismPlot} generate a pretty plot of GPP and ER estimates, with 95% confidence interval bands
+#'
+#' returns a formatted plot of metabolism modeling results, including confidence bands on model estimates.
+#' @param metab_output the list object returned by metabolismModeling.R
+#' @param filename character vector of filename for plot (including file extension)
+#'
+#' @return returns plot of metabolism data, as described in function overview
+#'
 
 metabolismPlot <- function(metab_output, filename){
   # if filename exists, load plot from file and display to user (with message that plot is loaded from file)

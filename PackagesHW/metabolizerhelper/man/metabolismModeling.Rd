@@ -29,5 +29,5 @@ metabolismModeling(metab.data, filename, pool_K600 = "binned",
 returns .csv of model predictions to local file, outputs dataframe of predictions to environment
 }
 \description{
-script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data.
+script to run model to estimate stream metabolism based on stream discharge, dissolved oxygen, dissolved oxygen saturation, and temperature data. will take considerable time to run.
 }
