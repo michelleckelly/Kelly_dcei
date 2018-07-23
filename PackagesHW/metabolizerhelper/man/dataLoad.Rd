@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataLoad.R
 \name{dataLoad}
 \alias{dataLoad}
-\title{load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user}
+\title{\code{dataLoad} format raw data and convert from American to SI units}
 \usage{
 dataLoad(filepath, lat, long, tz)
 }
@@ -19,7 +19,7 @@ dataLoad(filepath, lat, long, tz)
 dataframe of date-time in UTC, discharge in m^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation, site latitude and longitude
 }
 \description{
-load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user
+load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user ready to pump into \code{\link{dataPrep}}
 }
 \examples{
 dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")

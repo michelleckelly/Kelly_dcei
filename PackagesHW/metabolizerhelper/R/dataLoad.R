@@ -1,4 +1,6 @@
-#' load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user
+#' \code{dataLoad} format raw data and convert from American to SI units
+#'
+#' load local datafile (date-time, discharge in ft^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation), transform local time to UTC time, convert from American to SI units, attach latitude and longitude to dataframe, and then return data to user ready to pump into \code{\link{dataPrep}}
 #'
 #' @param filepath character vector, file path to data file, including file name and extension
 #' @param lat character vector, decimal latitude of site location
@@ -6,6 +8,7 @@
 #' @param tz character vector of the time zone, as recognized by OlsonNames
 #'
 #' @return dataframe of date-time in UTC, discharge in m^3/s, water temperature in C, dissolved oxygen in mg/L and percent saturation, site latitude and longitude
+#'
 #' @examples
 #' dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
 

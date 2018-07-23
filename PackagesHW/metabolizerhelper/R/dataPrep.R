@@ -1,19 +1,15 @@
-# preps data for metabolism modeling. Interpolates missing data points according to method of choice, estimates PAR from longitude and time data, estimates stream depth from discharge, converts DO saturation in percent to DO saturation in mg/L
-#
-# Arguments
-# data        dataframe, piped from dataLoad function, contains site information and 
-#             stream data
-# na.fill     character vector, algorithm that will be used by imputeTS::na.seasplit 
-#             to fill gaps in the time series data. see documentation of na.seasplit() 
-#             for a list of options. Defaults to interpolation
-#
-# Outputs
-# fitdata     dataframe, reformatted and ready to pipe into metabolismModeling.R
-#
-# Dependencies
-# library(streamMetabolizer)
-# library(imputeTS)
-# library(lubridate)
+#' \code{dataPrep} Interpolate missing data points and estimate PAR
+#'
+#' preps data (that has been formatted by \code{\link{dataLoad}}) for metabolism modeling. Interpolates missing data points according to method of choice, estimates PAR from longitude and time data, estimates stream depth from discharge, converts DO saturation in percent to DO saturation in mg/L
+#'
+#' @param data dataframe, piped from dataLoad function, contains site information and stream data
+#' @param na.fill character vector, algorithm that will be used by imputeTS::na.seasplit to fill gaps in the time series data. see documentation of na.seasplit() for a list of options. Defaults to interpolation
+#'
+#' @return dataframe, reformatted and ready to pipe into metabolismModeling.R
+#'
+#' @examples
+#' data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+#' dataPrep(data, na.fill = "interpolation")
 
 dataPrep <- function(data, na.fill = "interpolation"){
   # check that dateTime is class POSIXct
@@ -48,11 +44,11 @@ dataPrep <- function(data, na.fill = "interpolation"){
   }
   #
   # convert UTC to solar time
-  data$solar.time <- streamMetabolizer::convert_UTC_to_solartime(date.time = data$dateTime, 
+  data$solar.time <- streamMetabolizer::convert_UTC_to_solartime(date.time = data$dateTime,
                                                                  longitude = data$Long[1],
                                                                  time.type = "mean solar")
   # estimate PAR using latitude and solar time
-  apparentsolartime <- streamMetabolizer::convert_UTC_to_solartime(date.time = data$dateTime, 
+  apparentsolartime <- streamMetabolizer::convert_UTC_to_solartime(date.time = data$dateTime,
                                                                    longitude = data$Long[1],
                                                                    time.type = "apparent solar")
   data$light <- streamMetabolizer::calc_solar_insolation(app.solar.time = apparentsolartime,
