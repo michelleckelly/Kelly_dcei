@@ -1,0 +1,57 @@
+---
+title: "`metabolizerHelper` Vignette"
+author: "Michelle Catherine Kelly"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(metabolizerhelper)
+```
+
+## Importing data
+
+```{r dataLoad}
+# Data obtained from USGS Gage 05420500: Mississippi R at Clinton IA
+filepath_IA <- "./IA_MississippiR.csv"
+lat_IA <- "41.780556"
+long_IA <- "-90.251944"
+tz_IA <- "America/Chicago"
+
+# load in data with dataLoad function
+mississippi <- dataLoad(filepath = filepath_IA, lat = lat_IA, long = long_IA, tz = tz_IA)
+
+# display the first three lines of dataframe
+head(mississippi, n = 3)
+# display classes of columns in dataframe
+unlist(lapply(mississippi, class))
+```
+
+## Prepare data for modeling
+
+```{r dataPrep}
+mississippi_prepped <- dataPrep(mississippi)
+```
+
+## Model metabolism
+
+```{r metabolismModeling}
+mississippi_metabolism <- metabolismModeling(mississippi_prepped, "Mississippi_Metabolism.csv")
+```
+
+## Plot metabolism
+
+```{r metabolismPlotting}
+metabolismPlot(mississippi_metabolism)
+```
