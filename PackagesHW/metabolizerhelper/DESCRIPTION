@@ -1,0 +1,20 @@
+Package: metabolizerhelper
+Type: Package
+Title: Helper package for piping to streamMetabolizer and generating pretty plots 
+Version: 0.1.0
+Author: Michelle Catherine Kelly
+Maintainer: Michelle Catherine Kelly <michellekelly@ku.edu>
+Description: This package is designed to format a limited dataset of stream discharge, dissolved oxygen, 
+	and temperature data for stream metabolism modeling, using the streamMetabolizer package. 
+	metabolizerhelper approximates PAR based on latitude and time using functions within streamMetabolizer, 
+	if PAR is not provided. This package accomplishes similar goals as the streamPULSE package project, 
+	and users are encouraged to explore streamPULSE for wider functionality (although they will have to 
+	rely on metabolizerhelper for pretty plotting). This package was developed for a class assignment.
+    Imports:
+		ggplot2,
+		imputeTS,
+		lubridate,
+		streamMetabolizer
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
