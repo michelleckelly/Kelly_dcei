@@ -10,6 +10,12 @@
 #' @examples
 #' data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
 #' dataPrep(data, na.fill = "interpolation")
+#'
+#' @import lubridate
+#' @import imputeTS
+#' @import streamMetabolizer
+#' @import dplyr
+#' @export
 
 dataPrep <- function(data, na.fill = "interpolation"){
   # check that dateTime is class POSIXct

@@ -23,4 +23,5 @@ load local datafile (date-time, discharge in ft^3/s, water temperature in C, dis
 }
 \examples{
 dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+
 }

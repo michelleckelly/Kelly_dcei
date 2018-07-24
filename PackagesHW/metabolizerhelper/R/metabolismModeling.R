@@ -18,6 +18,9 @@
 #' data <- dataPrep(data, na.fill = "interpolation")
 #' model_data <- metabolismModeling(data, filename = "metabolismmodel_results.csv")
 #'
+#' @import streamMetabolizer
+#' @export
+#'
 metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
                                err_obs_iid = TRUE,
                                err_proc_acor = FALSE, err_proc_iid = TRUE,

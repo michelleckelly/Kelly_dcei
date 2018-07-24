@@ -11,6 +11,9 @@
 #'
 #' @examples
 #' dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
+#'
+#' @import lubridate
+#' @export
 
 dataLoad <- function(filepath, lat, long, tz){
   # check if filepath is valid

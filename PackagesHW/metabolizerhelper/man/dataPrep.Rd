@@ -20,4 +20,5 @@ preps data (that has been formatted by \code{\link{dataLoad}}) for metabolism mo
 \examples{
 data <- dataLoad(filepath = "./input_files/streamdata.csv", lat = "40", long = "-100", tz = "America/Chicago")
 dataPrep(data, na.fill = "interpolation")
+
 }
