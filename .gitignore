@@ -5,13 +5,13 @@
 .RData
 
 # Ignore Word files and powerpoint files
-*.docx
-*.pptx
+.docx
+.pptx
 
 # Ignore Rmd default cache directory
 /cache/
 
-# Ignore Rmd files for Proposal
+# Ignore Rmd-generated files for Proposal
 /UnitTestingHW/Proposal_files/
 /UnitTestingHW/Proposal_cache/
 
