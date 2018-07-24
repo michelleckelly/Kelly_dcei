@@ -50,7 +50,7 @@ metabolismModeling <- function(metab.data, filename, pool_K600 = "binned",
                                           deficit_src = deficit_src)
   modelspecs <- streamMetabolizer::specs(model_name = modelname,
                                          burnin_steps = 500, saved_steps = 500)
-  cat("Using a maximum likelihood estimation (MLE) method to fit your metabolism model.\n")
+  cat("Using an MCMC method to fit your metabolism model.\n")
   # run the model
   modelfit <- streamMetabolizer::metab(modelspecs, data = metab.data)
   # extract predictions
