@@ -39,12 +39,12 @@ model_Mississippi <-
 
 ```{r sacramento_modeling, echo = FALSE, warning = FALSE, message = FALSE}
 # data has gap during middle of year. see if you can find replacement
-# Sacramento River near Sacramento CA, USGS gage number 11447890
+# Sacramento River at Freeport CA, USGS gage number 11447650
 #
 # load data ------------------------------------------------------------
 filepath_CA <- "./FinalProject/input_data/CA_SacramentoR.csv"
-lat_CA <- "38.257778"
-long_CA <- "-121.517222"
+lat_CA <- "38.456111"
+long_CA <- "-121.500278"
 tz_CA <- "America/Los_Angeles"
 SacramentoR <- dataLoad(filepath = filepath_CA, lat = lat_CA, long = long_CA, tz = tz_CA)
 #
@@ -75,8 +75,6 @@ model_NorthBranch <-
   metabolismModeling(NorthBranch, 
                      filename = "./FinalProject/output_data/NorthBranch_MetabolismModel.csv")
 ```
-
-
 
 # Introduction
 
@@ -120,12 +118,17 @@ Values of GPP and ER both temporally varied, but GPP estimates were most depende
 
 ```{r mississippi_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Mississippi River, 2017. \\label{mississippi_plotting}"}
 metabolismPlot(model_Mississippi, 
-               filename = "./FinalProject/figures/IA_MississippiR_MetabolismModel.png")
+               filename = "./FinalProject/figures/MississippiR_MetabolismModel.png")
 ```
 
 ```{r connecti_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the North Branch of the Park River, 2017. \\label{connecti_plotting}"}
 metabolismPlot(model_NorthBranch, 
                filename = "./FinalProject/figures/NorthBranch_MetabolismModel.png")
+```
+
+```{r sacramento_plotting}
+metabolismPlot(model_Sacramento, 
+               filename = "./FinalProject/figures/SacramentoR_MetabolismModel.png")
 ```
 
 For the final report, we will compare and contrast the metabolism profiles of these three sites, and identify possible predictors for a resultant "regime types". We will also evaluate how ecosystem NEP varies throughout the year.  
