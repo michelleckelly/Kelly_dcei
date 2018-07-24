@@ -4,8 +4,9 @@
 # Ignore session data files
 .RData
 
-# Ignore Word files
+# Ignore Word files and powerpoint files
 *.docx
+*.pptx
 
 # Ignore Rmd default cache directory
 /cache/
@@ -14,11 +15,12 @@
 /UnitTestingHW/Proposal_files/
 /UnitTestingHW/Proposal_cache/
 
+# Ignore Rmd-generated files for final project
+/FinalProject/FinalProject_files/
+/FinalProject/FinalProject_cache/
+
 # Ignore any temp files that are created by Rmd
 *.utf9.md
 *.knit.md
-
-# Ignore PDF file of my redrawn manuscript figures
-/UnitTestingHW/Proposal_images/Vannote1980_Redraw.pptx
 
 .Rproj.user
