@@ -15,6 +15,9 @@
 /UnitTestingHW/Proposal_files/
 /UnitTestingHW/Proposal_cache/
 
+# Ignore .tex file created by Rmd
+/FinalProject/FinalProject.tex
+
 # Ignore Rmd-generated files for final project
 /FinalProject/FinalProject_files/
 /FinalProject/FinalProject_cache/

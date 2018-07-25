@@ -38,7 +38,6 @@ model_Mississippi <-
 ```
 
 ```{r sacramento_modeling, echo = FALSE, warning = FALSE, message = FALSE}
-# data has gap during middle of year. see if you can find replacement
 # Sacramento River at Freeport CA, USGS gage number 11447650
 #
 # load data ------------------------------------------------------------
@@ -85,13 +84,13 @@ In terrestrial systems, NEP often follows a predictable annual cycle. GPP and NE
 However, primary production in rivers and streams doesn't often correlate with the terrestrial growing season. In small streams, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Variations in stream flow, which can be caused by rain events, snow melt, or drought, scour or desiccate stream beds, reducing the biomass of primary producers. Stream hydrology can follow a yearly pattern, but vary widely between biomes [Figure \ref{bernhardt}]. Furthermore, reaches may also receive a significant carbon input from non-aquatic sources, such as an influx of leaf litter during Autumn, or the flushing of soil-bound organic matter during rain events [@Vannote1980]. Carbon input from terrestrial sources can equal or exceed yearly GPP, blurring the seasonal pattern of GPP and ER [@Bernhardt2018].
 
 ```{r bernhardt, echo = FALSE, fig.cap="Conceptual yearly hydrographs for rivers experiencing aseasonal rain dynamics, a mid-year monsoon season, and a spring snowmelt (adapted from Bernhardt et al. 2018). \\label{bernhardt}", out.height="20%", fig.align = "center"}
-knitr::include_graphics("./FinalProject/figures/Bernhardt2018.png")
+knitr::include_graphics("../FinalProject/figures/Bernhardt2018.PNG")
 ```
 
 As stream size increases, annual ecosystem productivity is less effected by reach morphology, and is more strongly correlated with the terrestrial growing season. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].
 
 ```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al. 1980). \\label{vannote}", out.height="30%", fig.align='center'}
-knitr::include_graphics("./FinalProject/figures/Vannote1980_edit.png")
+knitr::include_graphics("../FinalProject/figures/Vannote1980_edit.PNG")
 ```
 
 Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic regimes", suggesting dominant annual patterns of GPP and ER dynamics for river ecosystems subjected to similar physical and biochemical conditions [-@Bernhardt2018]. We propose to "ground-truth" the metabolism regime concept by asking (1) do we see these proposed regimes in real stream data, and (2) can use an annual metabolic profile to "diagnose" local stream conditions, such as annual precipitation patterns, stream size, or surrounding land use?  
@@ -100,11 +99,26 @@ Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic 
 
 ## Site details and raw data
 
-We selected the Mississippi River (Clinton, IA), the North Branch of the Park River (Hartford, CT), and the Sacramento River (near Sacramento, CA), for this analysis. These sites are located at similar latitudes to account for overall differences in light intensity, but have differences in river size, land use, and climate regime. Data was provided by the United States Geological Survey (USGS) National Water Information System database (waterdata.usgs.gov/nwis), and spanned from January 1, 2017 to November 1, 2017. Stream discharge, water temperature, and dissolved oxygen were measured at 15 minute intervals from January 1, 2017 to December 31, 2017 at the Sacramento and Park River sites, and thru November 1, 2017 at the Mississippi River site due to ice cover.  
+We selected the Mississippi River (Clinton, IA), the North Branch of the Park River (Hartford, CT), and the Sacramento River (Freeport, CA), for this analysis. These sites are located at similar latitudes to account for overall differences in light intensity, but have differences in river size, land use, and climate regime. Data was provided by the United States Geological Survey (USGS) National Water Information System database (waterdata.usgs.gov/nwis), and spanned from January 1, 2017 to November 1, 2017. Stream discharge, water temperature, and dissolved oxygen were measured at 15 minute intervals from January 1, 2017 to December 31, 2017 at the Sacramento and Park River sites, and thru November 1, 2017 at the Mississippi River site due to ice cover.  
 
 <!-- A note for final project: inserting a table here of stream attributes such as dominant land use, precipitation regime, river discharge, relative size would be a good idea -->
 
-Photosynthetically active radiation (PAR) was estimated using time and latitude. A more common (and accurate) approach would be to use PAR data collected at a local solar irradiance monitoring station, or collected by a portable in-field sensor. For the purposes of this preliminary proposal, we chose an estimation technique for a quick proof of concept. Depth data was back-calculated from instantaneous discharge measurements using $\ d=cQ^f$, where depth (d) is equal to the theoretical coefficient of depth at unit discharge (c, 0.409 m) multiplied by discharge (Q, m^3^ s^-1^) to the power of the theoretical exponent of depth at unit discharge (f, 0.294) [see @Leopold1953; @Raymond2012].  
+|Characteristic                 |Park              |Sacramento          |Mississippi              |
+|:------------------------------|:-----------------|:-------------------|:------------------------|
+|Site location (latitude)       |41°47'04.0"N      |38°27'22.0"N        |41°46'50.0"N             |
+|Site location (longitude)      |72°42'29.0"W      |121°30'01.0"W       |90°15'07.0"W             |
+|USGS gage number               |01191000          |11447650            |05420500                 |
+|Watershed drainage area (km^2^)|69.4              |68,600              |221,000                  |
+|Precipitation regime           |Aseasonal         |Winter (Jan-Feb)    |Spring/Summer (Apr-Jul)  |
+|Dominant land use              |Forested, urban   |Urban, agriculture  |Agriculture              |
+|Mean Q (m^3^ s^-1^) (min-max)  |0.436 (0.056-25.6)|1070 (289-2730)     |2340 (728-4730)          |
+|Mean T (&deg;C) (min-max)      |11 (0.0-27)       |15 (7.9-23)         |13 (0.9-28)              |
+|Mean turbidity (FNU) (min-max) |7.48 (0.9-584)    |19.5 (3.40-129)     |22.2 (2.4-256)           |
+|Mean N (mg-N L^-1^) (min-max)  |NA                |0.15 (0.08-0.51)    |2.4 (0.44-3.7)           |
+
+Table: Site characteristics of Park, Sacramento, and Mississippi River stations for 2017. Precipitation regime based on 2017 NOAA data. Land use based on USDA land cover maps. N data was not available for Park (= NA). Q = discharge, T = temperature, N = nitrate plus nitrite, min = minimum, max = maximum.
+
+Photosynthetically active radiation (PAR) was estimated using time and latitude. A more common (and accurate) approach would be to use PAR data collected at a local solar irradiance monitoring station, or collected by a portable in-field sensor. For the purposes of this preliminary proposal, we chose an estimation technique for a quick proof of concept. Depth data was back-calculated from instantaneous discharge measurements using $\ d = c Q^f $, where depth (d) is equal to the theoretical coefficient of depth at unit discharge (c, 0.409 m) multiplied by discharge (Q, m^3^ s^-1^) to the power of the theoretical exponent of depth at unit discharge (f, 0.294) [see @Leopold1953; @Raymond2012].  
 
 Missing data points were filled via interpolation, using `na.seasplit` function from the `imputeTS` R package [@imputeTS; @R]. This function seasonally decomposes time series data, and performs imputation seperately for each resulting seasonal chunk. This interpolation method is the same as that used by the `streamPULSE` team, a national stream metabolism research group [@StreamPULSE].
 
