@@ -79,19 +79,54 @@ model_NorthBranch <-
                      filename = "./FinalProject/output_data/NorthBranch_MetabolismModel.csv")
 ```
 
+```{Q_plot, echo = FALSE, warning = FALSE}
+# plot discharge vs dateTime
+Q_plot <- 
+  ggplot() +
+    geom_point(data = MississippiR_raw, size = 0.7,
+               aes(x = dateTime, y = Discharge_m3s, color = "Mississippi")) +
+    geom_point(data = SacramentoR_raw, size = 0.7,
+               aes(x = dateTime, y = Discharge_m3s, color = "Sacramento")) +
+    geom_point(data = NorthBranch_raw, size = 0.7,
+               aes(x = dateTime, y = Discharge_m3s, color = "Park")) +
+    labs(x = NULL, y = bquote("Q ("*m^3~s^-1*")")) +
+    scale_color_manual(values = c("#00BA38", "#00BFC4", "#F8766D")) +
+    scale_y_continuous(trans = "sqrt", breaks = c(100, 500, 1000, 2000, 3000, 4000, 5000)) +
+    scale_x_datetime(date_breaks = "2 months", date_labels = "%b") +
+    guides(color = guide_legend(override.aes = list(size = 4), title = NULL)) +
+    theme_classic() + theme(legend.position = "top")
+# save plot to png file
+ggsave(file = "./FinalProject/figures/Qplot.png", Q_plot, width = 5, height = 3.5)
+```
+
 ```{r NEP, echo = FALSE, warning = FALSE}
+# compute cumulative GPP, ER, and NEP for each site ----------------------
 source("./FinalProject/NEP_Calcs.R")
+#
+# plot cumulative GPP, ER, and NEP at each site --------------------------
 source("./FinalProject/NEP_Plotter.R")
-
-NEP_Missip_plot <- NEP_plotter(NEP_Missip, legend_pos = "top", 
-                               breaks = c(-3000, -1500, 0, 1500)) + labs(tag = "A", y = NULL)
-NEP_Sacr_plot <- NEP_plotter(NEP_Sacr, legend_pos = "top") + labs(tag = "B", y = NULL)
-NEP_Park_plot <- NEP_plotter(NEP_Park, legend_pos = "top") + labs(tag = "C", y = NULL)
-
-NEPgrob <- arrangeGrob(NEP_Missip_plot, NEP_Sacr_plot, NEP_Park_plot, 
-                       ncol = 3, nrow = 1, 
-                       left = textGrob(expression(paste("Cumulative", ~O[2]~m^-2~d^-1, "(g)")),
-                                       rot = 90, gp = gpar(cex = 0.9)))
+#
+# use NEP_plotter on NEP dataframes --------------------------------------
+NEP_Missip_plot <- 
+  NEP_plotter(NEP_Missip, legend_pos = "top", breaks = c(-3000, -1500, 0, 1500)) + 
+  labs(tag = "A", y = NULL)
+NEP_Sacr_plot <- 
+  NEP_plotter(NEP_Sacr, legend_pos = "top") + 
+  labs(tag = "B", y = NULL)
+NEP_Park_plot <- 
+  NEP_plotter(NEP_Park, legend_pos = "top") + 
+  labs(tag = "C", y = NULL)
+#
+# assemble textGrob for y-axis label 
+ylabel_NEP <- 
+  textGrob(expression(paste("Cumulative", ~O[2]~m^-2~d^-1, "(g)")), 
+           rot = 90, gp = gpar(cex = 0.9))
+#
+# combine plots using arrangeGrob
+NEPgrob <- 
+  arrangeGrob(NEP_Missip_plot, NEP_Sacr_plot, NEP_Park_plot, 
+              ncol = 3, nrow = 1, left = ylabel_NEP)
+# save combined plot to png file
 ggsave(file = "./FinalProject/figures/NEPplot.png", NEPgrob, width = 8, height = 2.5)
 ```
 
@@ -148,123 +183,25 @@ We used the `streamMetabolizer` R package to fit a Markov chain Monte Carlo (MCM
 
 Values of GPP and ER both temporally varied, but GPP estimates were most dependent upon season. It is likely that GPP may be correlated with T, PAR, and Q, but this analysis has not yet been completed. In the Mississippi, GPP was lowest during colder months (January-March and October-November), and with the exception of a decrease in GPP in early July, closely follows the terrestrial growing season. Confidence intervals on ER estimates were much wider than those on GPP estimates, especially during colder months [Figure \ref{metab_plot}]. A similar analysis of the lower Mississippi River (Baton Rouge, LA) shows a negative correlation between PAR and GPP, and suggests that PAR may be indirectly related to disturbance effects, as maximum PAR and highest Q co-occured during late summer [@Dodds2013].
 
-```{r discharge_plotting, fig.height=3, fig.width = 4, echo = FALSE, warning = FALSE, fig.cap="Stream discharge (Q) in the Mississippi River, Park River, and Sacramento River during 2017. \\label{discharge_plotting}"}
-ggplot() +
-  geom_point(data = MississippiR_raw, size = 0.7,
-             aes(x = dateTime, y = Discharge_m3s, color = "Mississippi")) +
-  geom_point(data = SacramentoR_raw, size = 0.7,
-             aes(x = dateTime, y = Discharge_m3s, color = "Sacramento")) +
-  geom_point(data = NorthBranch_raw, size = 0.7,
-             aes(x = dateTime, y = Discharge_m3s, color = "Park")) +
-  labs(x = NULL, y = bquote("Q ("*m^3~s^-1*")")) +
-  scale_color_manual(values = c("#f1a340", "#998ec3", "#a1d76a")) +
-  scale_y_continuous(trans = "sqrt") +
-  scale_x_datetime(date_breaks = "1 month", date_labels = "%b") +
-  guides(color = guide_legend(override.aes = list(size = 4))) +
-  theme_classic() + theme(legend.position = "top")
+```{r Q_plot_load, echo = FALSE, out.height="30%",fig.align="center",fig.cap="Annual stream discharge (Q) in the Mississippi River (green), Park River (blue), and Sacramento River (pink) for 2017. Each point represents one measurement.\\label{Q_plot}"}
+knitr::include_graphics("../FinalProject/figures/Qplot.png")
 ```
 
-```{r PAR_Q, echo = FALSE, warning = FALSE, message=FALSE, fig.width=6, fig.height=4, fig.cap="Relationship of discharge (Q) to gross primary production (GPP) (A, B, C) and ecosystem respiration (ER) (D, E, F) in the Mississippi (A, D), Sacramento (B, E), and Park River (C, F) during 2017. Each point represents a daily average.\\label{PAR_Q}"}
-# move this into seperate function ----------------------------
-model_Mississippi$date <- lubridate::ymd(model_Mississippi$date)
-model_NorthBranch$date <- lubridate::ymd(model_NorthBranch$date)
-model_Sacramento$date <- lubridate::ymd(model_Sacramento$date)
-
-Q <- 
-  MississippiR_raw %>%
-    group_by(date = lubridate::date(dateTime)) %>%
-    summarise(Q = mean(na.omit(Discharge_m3s)))
-
-PAR_Q <- merge(Q, model_Mississippi, by = "date")
-PAR_Q <- data.frame(date = PAR_Q$date, Q.Missip = PAR_Q$Q, 
-                    GPP.Missip = PAR_Q$GPP, ER.Missip = PAR_Q$ER)
-
-Q <- 
-  NorthBranch_raw %>%
-  group_by(date = lubridate::date(dateTime)) %>%
-  summarise(Q = mean(na.omit(Discharge_m3s)))
-
-Q <- merge(Q, model_NorthBranch, by = "date")
-Q <- data.frame(date = Q$date, Q.Park = Q$Q, GPP.Park = Q$GPP, ER.Park = Q$ER)
-
-PAR_Q <- merge(PAR_Q, Q, by = "date")
-
-Q <- 
-  SacramentoR_raw %>%
-  group_by(date = lubridate::date(dateTime)) %>%
-  summarise(Q = mean(na.omit(Discharge_m3s)))
-
-Q <- merge(Q, model_Sacramento, by = "date")
-Q <- data.frame(date = Q$date, Q.Sacr = Q$Q, GPP.Sacr = Q$GPP, ER.Sacr = Q$ER)
-
-PAR_Q <- merge(PAR_Q, Q, by = "date")
-
-# actual plot setup --------------------------------------------------------
-# Q, GPP plots -------------------------------
-# Mississippi
-a <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Missip, y = GPP.Missip), shape = 1) +
-    scale_x_continuous(breaks = c(1500, 3000, 4500)) +
-    theme_classic() + labs(x = NULL, y = NULL, tag = "A")
-# Sacramento
-b <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Sacr, y = GPP.Sacr), shape = 1) +
-    scale_x_continuous(breaks = c(800, 1600, 2400)) +
-    scale_y_continuous(breaks = c(-0.5, 1.5, 3.5, 5.5)) +
-    labs(x = NULL, y = NULL, tag = "B") +
-    theme_classic()
-# Park
-c <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Park, y = GPP.Park), shape = 1) +
-    labs(x = NULL, y = NULL, tag = "C") +
-    scale_y_continuous(breaks = c(0, 3, 6, 9)) +
-    theme_classic()
-# Q, ER plots --------------------------------
-# Mississippi
-d <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Missip, y = ER.Missip), shape = 1) +
-    scale_x_continuous(breaks = c(1500, 3000, 4500)) +
-    scale_y_continuous(breaks = c(-22, -12, -2, 8)) +
-    labs(x = NULL, y = NULL, tag = "D") +
-    theme_classic()
-# Sacramento
-e <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Sacr, y = ER.Sacr), shape = 1) +
-    scale_x_continuous(breaks = c(800, 1600, 2400)) +
-    scale_y_continuous(breaks = c(-30, -15, -0, 15)) +
-    labs(x = NULL, y = NULL, tag = "E") +
-    theme_classic()
-# Park
-f <- ggplot(data = PAR_Q) +
-    geom_point(aes(x = Q.Park, y = ER.Park), shape = 1) +
-    scale_y_continuous(breaks = c(-9, -6, -3, 0)) +
-    labs(x = NULL, y = NULL, tag = "F") +
-    theme_classic()
-
-ylabel_GPP <- textGrob(expression(paste("GPP (g ", ~O[2]~m^-2~d^-1, ")")),
-                       rot = 90, gp = gpar(cex = 0.9))
-ylabel_ER <- textGrob(expression(paste("ER (g ", ~O[2]~m^-2~d^-1, ")")),
-                      rot = 90, gp = gpar(cex = 0.9))
-xlabel <- textGrob(expression(paste("Q (", m^3, " ", s^-1, ")")), gp = gpar(cex = 0.9))
-
-grid.arrange(arrangeGrob(a,b,c, left = ylabel_GPP, ncol = 3, nrow = 1),
-             arrangeGrob(d,e,f, left = ylabel_ER, ncol = 3, nrow = 1),
-             bottom = xlabel
-)
+```{r Q_GPP_ER, echo = FALSE, warning = FALSE, ,message=FALSE, fig.width=6, fig.height=4, fig.cap="Relationship of discharge (Q) to gross primary production (GPP) (A, B, C) and ecosystem respiration (ER) (D, E, F) in the Mississippi (A, D), Sacramento (B, E), and Park River (C, F) during 2017. Each point represents a daily average.\\label{PAR_Q}"}
+source("./FinalProject/Q_GPP_ER_Plotter.R")
 ```
 
-
-```{r mississippi_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Mississippi River, 2017. \\label{mississippi_plotting}"}
+```{r mississippi_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="Estimate of gross primary productivity (GPP) and ecosystem respiration (ER) in the Mississippi River during 2017.\\label{mississippi_plotting}"}
 metabolismPlot(model_Mississippi, 
                filename = "./FinalProject/figures/MississippiR_MetabolismModel.png")
 ```
 
-```{r sacramento_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the Sacramento River, 2017. \\label{sacr_plotting}"}
+```{r sacramento_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="Estimate of gross primary productivity (GPP) and ecosystem respiration (ER) in the Sacramento River during 2017. \\label{sacr_plotting}"}
 metabolismPlot(model_Sacramento, 
                filename = "./FinalProject/figures/SacramentoR_MetabolismModel.png")
 ```
 
-```{r connecti_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="An annual estimate of GPP and ER in the North Branch of the Park River, 2017. \\label{connecti_plotting}"}
+```{r connecti_plotting, fig.height=3, fig.width = 8, echo = FALSE, warning = FALSE, fig.cap="Estimate of gross primary productivity (GPP) and ecosystem respiration (ER) in the Park River during 2017. \\label{connecti_plotting}"}
 metabolismPlot(model_NorthBranch, 
                filename = "./FinalProject/figures/NorthBranch_MetabolismModel.png")
 ```
