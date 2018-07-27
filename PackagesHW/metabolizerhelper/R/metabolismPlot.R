@@ -26,8 +26,9 @@ metabolismPlot <- function(metab_output, filename){
       ggplot2::geom_ribbon(aes(ymin = GPP.lower, ymax = GPP.upper, fill = "GPP"), alpha = 0.3) +
       ggplot2::geom_ribbon(aes(ymin = ER.lower, ymax = ER.upper, fill = "ER"), alpha = 0.3) +
       ggplot2::geom_line(aes(y = 0), linetype = "dashed", color = "grey") +
-      ggplot2::labs(x = "Date", y = bquote(O[2] ~ m^-2 ~ d^-1 ~ "(g)")) +
+      ggplot2::labs(x = NULL, y = bquote(O[2] ~ m^-2 ~ d^-1 ~ "(g)")) +
       ggplot2::scale_color_discrete(name = NULL) +
+      ggplot2::scale_x_date(date_breaks = "1 month", date_labels = "%b") +
       ggplot2::scale_fill_discrete(name = "95% CI", labels = NULL) +
       ggplot2::theme_classic() + theme(legend.position = "top")
   ggplot2::ggsave(filename = filename, plot = plot, width = 8,
