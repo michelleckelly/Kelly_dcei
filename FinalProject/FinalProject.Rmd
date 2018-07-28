@@ -1,6 +1,6 @@
 ---
 title: "Data Carpentry: Final Project"
-author: "Michelle Kelly"
+author: "Michelle Catherine Kelly"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   rmarkdown::pdf_document:
@@ -135,14 +135,12 @@ ggsave(file = "./FinalProject/figures/NEPplot.png", NEPgrob, width = 8, height =
 Ecosystem metabolism is a key indicator of the trophic structure, carbon cycling rates, and organic matter content within a system. The conversion rate of solar energy to organic energy within an ecosystem is termed gross primary productivity (GPP), and can be measured as oxygen produced per day. The consumption of this organic energy, by both autotrophs and heterotrophs, is termed ecosystem respiration (ER). The balance between GPP and ER is referred to as net ecosystem production (NEP), and can be used as an indicator of whether a system is net producing or consuming carbon [@Odum1956; @Woodwell1968].  
 
 In terrestrial systems, NEP often follows a predictable annual cycle. GPP and NEP tend to peak during warm, wet summer months, when conditions are most favorable for photosynthetic growth. Lakes also tend to follow this cycle; summertime light availability, higher water temperatures, and available dissolved nutrients creates the ideal cocktail for algae, moss, and macrophyte growth [@Woodwell1968].  
-
-However, primary production in rivers doesn't often follow the terrestrial growing season. In small streams, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Variations in stream flow, which can be caused by rain events, snow melt, or drought, scour or desiccate stream beds, reducing the biomass of primary producers. Stream hydrology can follow a yearly pattern, but vary widely between biomes [Figure \ref{bernhardt}]. Furthermore, reaches may also receive a significant carbon input from non-aquatic sources, such as an influx of leaf litter during Autumn, or the flushing of soil-bound organic matter during rain events [@Vannote1980]. Carbon input from terrestrial sources can equal or exceed yearly GPP, blurring the seasonal pattern of GPP and ER [@Bernhardt2018].
-
 ```{r bernhardt, echo = FALSE, fig.cap="Conceptual yearly hydrographs for rivers experiencing aseasonal rain dynamics, a mid-year monsoon season, and a spring snowmelt (adapted from Bernhardt et al. 2018). \\label{bernhardt}", out.height="20%", fig.align = "center"}
 knitr::include_graphics("../FinalProject/figures/Bernhardt2018.PNG")
 ```
+However, primary production in rivers doesn't often follow the terrestrial growing season. In small streams, light availability decreases in summer, as canopy leaf-out prevents light from reaching surface water. Variations in stream flow, which can be caused by rain events, snow melt, or drought, scour or desiccate stream beds, reducing the biomass of primary producers. Stream hydrology can follow a yearly pattern, but vary widely between biomes [Figure \ref{bernhardt}]. Furthermore, reaches may also receive a significant carbon input from non-aquatic sources, such as an influx of leaf litter during Autumn, or the flushing of soil-bound organic matter during rain events [@Vannote1980]. Carbon input from terrestrial sources can equal or exceed yearly GPP, blurring the seasonal pattern of GPP and ER [@Bernhardt2018].  
 
-As stream size increases, annual ecosystem productivity is less effected by reach morphology, and is more strongly correlated with the terrestrial growing season. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].
+As stream size increases, annual ecosystem productivity is less effected by reach morphology, and is more strongly correlated with the terrestrial growing season. In wide, open rivers, canopy cover ceases to be a limiting factor [Figure \ref{vannote}]. Water velocity decreases with increasing channel width, reducing scouring, even under the same hydrologic regimes [@Leopold1953]. In large rivers, terrestrial organic matter tends to make up a smaller fraction of the system's total dissolved organic matter [@Vannote1980].  
 
 ```{r vannote, echo = FALSE, fig.cap="The relationship between stream size and stream attributes (adapted from Vannote et al. 1980). \\label{vannote}", out.height="30%", fig.align='center'}
 knitr::include_graphics("../FinalProject/figures/Vannote1980_edit.PNG")
@@ -154,7 +152,7 @@ Recently, Bernhardt et. al proposed a conceptual framework of stream "metabolic 
 
 ## Site details and raw data
 
-We selected the Mississippi River (Clinton, IA), the North Branch of the Park River (Hartford, CT), and the Sacramento River (Freeport, CA), for this analysis. These sites are located at similar latitudes to account for overall differences in light intensity, but have differences in river size, land use, and climate regime. Data was provided by the United States Geological Survey (USGS) National Water Information System database (waterdata.usgs.gov/nwis), and spanned from January 1, 2017 to November 1, 2017. Stream discharge, water temperature, and dissolved oxygen were measured at 15 minute intervals from January 1, 2017 to December 31, 2017 at the Sacramento and Park River sites, and thru November 1, 2017 at the Mississippi River site due to ice cover.  
+We selected three study systems: the Mississippi River (Clinton, IA), the Sacramento River (Freeport, CA), and the North Branch of the Park River (Hartford, CT). These sites differ in river size, surrounding land use, and climate regime, but are located at similar latitudes, to account for overall differences in light intensity [Table 1]. Data spanning from January 1 - December 31, 2017 was obtained from the United States Geological Survey (USGS) National Water Information System database (waterdata.usgs.gov/nwis).  
 
 |Characteristic                 |Park              |Sacramento          |Mississippi              |
 |:------------------------------|:-----------------|:-------------------|:------------------------|
@@ -171,13 +169,17 @@ We selected the Mississippi River (Clinton, IA), the North Branch of the Park Ri
 
 Table: Site characteristics of Park, Sacramento, and Mississippi River stations for 2017. Precipitation regime based on 2017 NOAA data. Land use based on USDA land cover maps. N data was not available for Park (= NA). Q = discharge, T = temperature, N = nitrate plus nitrite, min = minimum, max = maximum.
 
-Photosynthetically active radiation (PAR) was estimated using time and latitude. A more common (and accurate) approach would be to use PAR data collected at a local solar irradiance monitoring station, or collected by a portable in-field sensor. For the purposes of this preliminary proposal, we chose an estimation technique for a quick proof of concept. Depth data was back-calculated from instantaneous discharge measurements using $\ d = c Q^f $, where depth (d) is equal to the theoretical coefficient of depth at unit discharge (c, 0.409 m) multiplied by discharge (Q, m^3^ s^-1^) to the power of the theoretical exponent of depth at unit discharge (f, 0.294) [see @Leopold1953; @Raymond2012].  
+Stream discharge, water temperature, and dissolved oxygen were measured at 15 minute intervals. Any data points (due to sensor malfunction) were estimated via interpolation, using the `na.seasplit` function from the `imputeTS` R package [@imputeTS; @R]. This function seasonally decomposes time series data, and performs imputation seperately for each resulting seasonal chunk. This interpolation method is the same as that used by the `streamPULSE` team, a national stream metabolism research group [@StreamPULSE].  
 
-Missing data points were filled via interpolation, using `na.seasplit` function from the `imputeTS` R package [@imputeTS; @R]. This function seasonally decomposes time series data, and performs imputation seperately for each resulting seasonal chunk. This interpolation method is the same as that used by the `streamPULSE` team, a national stream metabolism research group [@StreamPULSE].
+\begin{align} 
+d = c ~ Q^f 
+\end{align}
+
+Photosynthetically active radiation (PAR) was estimated using the `streamMetabolizer` R package function `calc_light`, based on site latitude, day of year, and time, as local (<100 km) solar irradiace data was not available [@streamMetabolizer]. Dissolved oxygen saturation was directly measured at each site, so it was not necessary to model oxygen reaeration rates. River depth (d) was back-calculated from instantaneous discharge data (Eq. 1). Where the theoretical coefficient of depth at unit discharge (c, 0.409 m) is multiplied by discharge (Q, m^3^ s^-1^), raised to the power of the theoretical exponent of depth at unit discharge (f, 0.294) [see @Leopold1953; @Raymond2012].  
 
 ## Metabolism modeling
 
-We used the `streamMetabolizer` R package to fit a Markov chain Monte Carlo (MCMC) model to the data, using 500 samples for a warmup and 500 samples to fit the model (1000 total samples) [@streamMetabolizer]. For this preliminary report, the metabolism model was fit to the Mississippi River site only. Standard methods for the direct calculation of GPP, ER, and NEP [see @Odum1956] can't allow for changing air-water gas exchange dynamics with changing discharge, which introduces considerable error into multi-day metabolism estimates [@Appling2018].  
+A Markov chain Monte Carlo (MCMC) model was fit with the `streamMetabolizer` R package, using 4 chains of 1000 steps each (500 burn-in, 500 saved) [@streamMetabolizer]. A baysian model has considerable advantage over standard calculation methods [see @Odum1956], as it can allow for a dynamic relationship between air-water gas exchange coefficents and discharge data. This creates a better approximation of real-world conditions, and considerably reduces the amount of error traditionally observed in multi-day metabolism estimates [@Appling2018].  
 
 # Results  
 
