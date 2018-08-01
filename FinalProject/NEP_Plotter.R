@@ -3,7 +3,7 @@
 # Arguments
 # NEP_dataframe   dataframe returned by NEP_calcs
 # legend_pos      character string, see theme() within ggplot. "top", "bottom", "left", "right" or "none"
-# ...             intended so user can specify their own y-axis breaks, if desired
+# ...             intended so user can specify their own y-limits
 #
 # Returns
 # time series plot of cumulative ER, GPP, and NEP
@@ -19,7 +19,7 @@ NEP_plotter <- function(NEP_dataframe, legend_pos, ...){
     labs(x = NULL, y = bquote("Cumulative"~ O[2] ~ m^-2 ~ d^-1 ~ "(g)")) +
     scale_color_manual(name = NULL, 
                        values = c("NEP" = "#7CAE00", "ER" = "#F8766D", "GPP" = "#00BFC4")) +
-    scale_y_continuous(...) +
+    ylim(...) + 
     guides(color = guide_legend(override.aes = list(size = 4))) +
     theme_classic() + theme(legend.position = legend_pos)
 }
